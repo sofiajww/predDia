@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Waktu pembuatan: 11 Jan 2026 pada 08.15
--- Versi server: 10.4.32-MariaDB
--- Versi PHP: 8.0.30
+-- Host: localhost:3306
+-- Generation Time: Jan 16, 2026 at 11:35 AM
+-- Server version: 8.0.30
+-- PHP Version: 8.1.10
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,21 +24,21 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `admins`
+-- Table structure for table `admins`
 --
 
 CREATE TABLE `admins` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `remember_token` varchar(100) DEFAULT NULL,
+  `id` bigint UNSIGNED NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data untuk tabel `admins`
+-- Dumping data for table `admins`
 --
 
 INSERT INTO `admins` (`id`, `name`, `email`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
@@ -47,26 +47,26 @@ INSERT INTO `admins` (`id`, `name`, `email`, `password`, `remember_token`, `crea
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `data_kesehatans`
+-- Table structure for table `data_kesehatans`
 --
 
 CREATE TABLE `data_kesehatans` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `user_id` bigint(20) UNSIGNED NOT NULL,
-  `Pregnancies` int(11) DEFAULT NULL,
-  `Glucose` int(11) NOT NULL,
-  `BloodPressure` int(11) DEFAULT NULL,
-  `SkinThickness` int(11) DEFAULT NULL,
+  `id` bigint UNSIGNED NOT NULL,
+  `user_id` bigint UNSIGNED NOT NULL,
+  `Pregnancies` int DEFAULT NULL,
+  `Glucose` int NOT NULL,
+  `BloodPressure` int DEFAULT NULL,
+  `SkinThickness` int DEFAULT NULL,
   `Insulin` double(8,2) DEFAULT NULL,
   `BMI` double(8,2) NOT NULL,
   `DiabetesPedigreeFunction` double(8,2) DEFAULT NULL,
-  `Age` int(11) NOT NULL,
+  `Age` int NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data untuk tabel `data_kesehatans`
+-- Dumping data for table `data_kesehatans`
 --
 
 INSERT INTO `data_kesehatans` (`id`, `user_id`, `Pregnancies`, `Glucose`, `BloodPressure`, `SkinThickness`, `Insulin`, `BMI`, `DiabetesPedigreeFunction`, `Age`, `created_at`, `updated_at`) VALUES
@@ -90,52 +90,62 @@ INSERT INTO `data_kesehatans` (`id`, `user_id`, `Pregnancies`, `Glucose`, `Blood
 (18, 11, 12, 200, 190, 33, 160.00, 27.60, 0.35, 30, '2026-01-10 23:40:57', '2026-01-10 23:40:57'),
 (19, 11, 0, 80, 100, 23, 90.00, 22.40, 0.36, 25, '2026-01-10 23:41:34', '2026-01-10 23:41:34'),
 (20, 12, 1, 89, 66, 23, 94.00, 28.10, 0.17, 21, '2026-01-11 00:01:19', '2026-01-11 00:01:19'),
-(21, 12, 0, 137, 40, 35, 168.00, 43.10, 2.23, 33, '2026-01-11 00:02:28', '2026-01-11 00:02:28');
+(21, 12, 0, 137, 40, 35, 168.00, 43.10, 2.23, 33, '2026-01-11 00:02:28', '2026-01-11 00:02:28'),
+(22, 13, 2, 123, 278, 39, 180.00, 33.00, 2.00, 22, '2026-01-11 04:33:08', '2026-01-11 04:33:08'),
+(23, 14, 4, 90, 120, 26, 100.00, 23.30, 0.35, 24, '2026-01-11 20:34:09', '2026-01-11 20:34:09'),
+(24, 2, 34, 334, 224, 22, 189.00, 22.00, 2.00, 34, '2026-01-11 22:15:25', '2026-01-11 22:15:25'),
+(25, 15, 3, 120, 120, 33, 100.00, 24.00, 0.10, 25, '2026-01-12 21:10:51', '2026-01-12 21:10:51'),
+(26, 15, 20, 200, 200, 55, 230.00, 30.00, 5.00, 22, '2026-01-13 05:00:12', '2026-01-13 05:00:12'),
+(27, 2, 4, 200, 180, 33, 200.00, 26.60, 4.00, 26, '2026-01-14 04:24:21', '2026-01-14 04:24:21'),
+(28, 15, 0, 100, 120, 20, 100.00, 24.00, 0.00, 24, '2026-01-14 09:30:43', '2026-01-14 09:30:43'),
+(29, 16, 8, 250, 230, 33, 190.00, 29.60, 1.30, 30, '2026-01-14 20:31:07', '2026-01-14 20:31:07'),
+(30, 2, 0, 80, 100, 20, 100.00, 22.00, 0.00, 20, '2026-01-15 05:44:59', '2026-01-15 05:44:59'),
+(31, 17, 8, 230, 190, 33, 197.00, 27.30, 0.67, 20, '2026-01-15 19:54:26', '2026-01-15 19:54:26');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `failed_jobs`
+-- Table structure for table `failed_jobs`
 --
 
 CREATE TABLE `failed_jobs` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `uuid` varchar(255) NOT NULL,
-  `connection` text NOT NULL,
-  `queue` text NOT NULL,
-  `payload` longtext NOT NULL,
-  `exception` longtext NOT NULL,
-  `failed_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `id` bigint UNSIGNED NOT NULL,
+  `uuid` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `connection` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `exception` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `hasil_prediksi`
+-- Table structure for table `hasil_prediksi`
 --
 
 CREATE TABLE `hasil_prediksi` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `data_kesehatan_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `id_admin` bigint(20) UNSIGNED DEFAULT NULL,
-  `hasil` varchar(255) NOT NULL,
-  `tanggal_prediksi` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `id` bigint UNSIGNED NOT NULL,
+  `data_kesehatan_id` bigint UNSIGNED DEFAULT NULL,
+  `user_id` bigint UNSIGNED DEFAULT NULL,
+  `id_admin` bigint UNSIGNED DEFAULT NULL,
+  `hasil` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tanggal_prediksi` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data untuk tabel `hasil_prediksi`
+-- Dumping data for table `hasil_prediksi`
 --
 
 INSERT INTO `hasil_prediksi` (`id`, `data_kesehatan_id`, `user_id`, `id_admin`, `hasil`, `tanggal_prediksi`, `created_at`, `updated_at`) VALUES
 (2, 6, 5, NULL, 'Negatif Diabetes', '2026-01-09 22:37:23', '2026-01-09 22:37:23', '2026-01-09 22:37:23'),
 (3, 7, NULL, NULL, 'Negatif Diabetes', '2026-01-09 22:40:06', '2026-01-09 22:40:06', '2026-01-09 22:40:06'),
 (4, 8, 5, NULL, 'Negatif Diabetes', '2026-01-09 23:30:43', '2026-01-09 23:30:43', '2026-01-09 23:30:43'),
-(5, 9, NULL, NULL, 'Positif Diabetes', '2026-01-09 23:39:32', '2026-01-09 23:39:32', '2026-01-09 23:39:32'),
-(6, 10, 7, 2, 'Positif Diabetes', '2026-01-11 06:11:48', '2026-01-09 23:41:35', '2026-01-10 23:11:48'),
-(7, 11, 7, NULL, 'Negatif Diabetes', '2026-01-09 23:42:14', '2026-01-09 23:42:14', '2026-01-09 23:42:14'),
+(5, 9, NULL, 2, 'Positif Diabetes', '2026-01-11 12:04:09', '2026-01-09 23:39:32', '2026-01-11 05:04:09'),
+(6, 10, NULL, 2, 'Positif Diabetes', '2026-01-11 06:11:48', '2026-01-09 23:41:35', '2026-01-10 23:11:48'),
+(7, 11, NULL, 2, 'Negatif Diabetes', '2026-01-14 11:29:00', '2026-01-09 23:42:14', '2026-01-14 04:29:00'),
 (8, 12, 8, NULL, 'Negatif Diabetes', '2026-01-10 01:00:34', '2026-01-10 01:00:34', '2026-01-10 01:00:34'),
 (9, 13, 9, NULL, 'Negatif Diabetes', '2026-01-10 20:11:10', '2026-01-10 20:11:10', '2026-01-10 20:11:10'),
 (10, 14, 9, NULL, 'Negatif Diabetes', '2026-01-10 21:10:19', '2026-01-10 21:10:19', '2026-01-10 21:10:19'),
@@ -145,22 +155,32 @@ INSERT INTO `hasil_prediksi` (`id`, `data_kesehatan_id`, `user_id`, `id_admin`, 
 (14, 18, NULL, NULL, 'Positif Diabetes', '2026-01-10 23:40:57', '2026-01-10 23:40:57', '2026-01-10 23:40:57'),
 (15, 19, NULL, NULL, 'Negatif Diabetes', '2026-01-10 23:41:34', '2026-01-10 23:41:34', '2026-01-10 23:41:34'),
 (16, 20, 12, NULL, 'Negatif Diabetes', '2026-01-11 00:01:20', '2026-01-11 00:01:20', '2026-01-11 00:01:20'),
-(17, 21, 12, NULL, 'Positif Diabetes', '2026-01-11 00:02:28', '2026-01-11 00:02:28', '2026-01-11 00:02:28');
+(17, 21, 12, NULL, 'Positif Diabetes', '2026-01-11 00:02:28', '2026-01-11 00:02:28', '2026-01-11 00:02:28'),
+(18, 22, 13, NULL, 'Negatif Diabetes', '2026-01-11 04:33:08', '2026-01-11 04:33:08', '2026-01-11 04:33:08'),
+(19, 23, 14, 2, 'Negatif Diabetes', '2026-01-12 03:37:09', '2026-01-11 20:34:12', '2026-01-11 20:37:09'),
+(20, 24, 2, NULL, 'Positif Diabetes', '2026-01-11 22:15:25', '2026-01-11 22:15:25', '2026-01-11 22:15:25'),
+(21, 25, 15, NULL, 'Negatif Diabetes', '2026-01-12 21:10:54', '2026-01-12 21:10:54', '2026-01-12 21:10:54'),
+(22, 26, 15, NULL, 'Positif Diabetes', '2026-01-13 05:00:13', '2026-01-13 05:00:13', '2026-01-13 05:00:13'),
+(23, 27, 2, NULL, 'Positif Diabetes', '2026-01-14 04:24:23', '2026-01-14 04:24:23', '2026-01-14 04:24:23'),
+(24, 28, 15, NULL, 'Negatif Diabetes', '2026-01-14 09:30:45', '2026-01-14 09:30:45', '2026-01-14 09:30:45'),
+(25, 29, 16, 2, 'Positif Diabetes', '2026-01-15 03:33:20', '2026-01-14 20:31:07', '2026-01-14 20:33:20'),
+(26, 30, 2, NULL, 'Negatif Diabetes', '2026-01-15 05:45:01', '2026-01-15 05:45:01', '2026-01-15 05:45:01'),
+(27, 31, 17, 2, 'Positif Diabetes', '2026-01-16 02:55:46', '2026-01-15 19:54:28', '2026-01-15 19:55:46');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `migrations`
+-- Table structure for table `migrations`
 --
 
 CREATE TABLE `migrations` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `migration` varchar(255) NOT NULL,
-  `batch` int(11) NOT NULL
+  `id` int UNSIGNED NOT NULL,
+  `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `batch` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data untuk tabel `migrations`
+-- Dumping data for table `migrations`
 --
 
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
@@ -178,29 +198,36 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `password_resets`
+-- Table structure for table `password_resets`
 --
 
 CREATE TABLE `password_resets` (
-  `email` varchar(255) NOT NULL,
-  `token_hash` varchar(255) DEFAULT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token_hash` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `expires_at` datetime DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `password_resets`
+--
+
+INSERT INTO `password_resets` (`email`, `token_hash`, `expires_at`, `created_at`) VALUES
+('sofianjarwati0@gmail.com', '622fcb14d372ec1af76915226b75d0da649dd0264431875e6bd71ff8a0a282a4', '2026-01-16 03:09:53', '2026-01-15 19:54:53');
+
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `personal_access_tokens`
+-- Table structure for table `personal_access_tokens`
 --
 
 CREATE TABLE `personal_access_tokens` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `tokenable_type` varchar(255) NOT NULL,
-  `tokenable_id` bigint(20) UNSIGNED NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `token` varchar(64) NOT NULL,
-  `abilities` text DEFAULT NULL,
+  `id` bigint UNSIGNED NOT NULL,
+  `tokenable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tokenable_id` bigint UNSIGNED NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `abilities` text COLLATE utf8mb4_unicode_ci,
   `last_used_at` timestamp NULL DEFAULT NULL,
   `expires_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -208,7 +235,7 @@ CREATE TABLE `personal_access_tokens` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data untuk tabel `personal_access_tokens`
+-- Dumping data for table `personal_access_tokens`
 --
 
 INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `name`, `token`, `abilities`, `last_used_at`, `expires_at`, `created_at`, `updated_at`) VALUES
@@ -235,89 +262,125 @@ INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `n
 (24, 'App\\Models\\User', 11, 'api-token', 'f5ba6984f685a5ede1d2f6464908c4a83c220262b731ba05aff62c15b7f976a4', '[\"*\"]', '2026-01-10 23:55:06', NULL, '2026-01-10 23:55:03', '2026-01-10 23:55:06'),
 (25, 'App\\Models\\User', 12, 'api-token', '580829ffb39457cad6735dc314e36b3dcafced5d792347bbea4b5e06b65bd483', '[\"*\"]', '2026-01-11 00:02:29', NULL, '2026-01-10 23:59:50', '2026-01-11 00:02:29'),
 (26, 'App\\Models\\User', 12, 'api-token', '1e4ae695be8b68bf9bb98910d2b14aca90fa32338eb6555de90f7af8fde5bd1f', '[\"*\"]', '2026-01-11 00:04:23', NULL, '2026-01-11 00:04:19', '2026-01-11 00:04:23'),
-(28, 'App\\Models\\Admin', 2, 'admin-token', 'a405639834b863a5f9faa8a04c9e624750f2cf962584eb8078039a7c2e094154', '[\"*\"]', '2026-01-11 00:12:35', NULL, '2026-01-11 00:06:17', '2026-01-11 00:12:35');
+(28, 'App\\Models\\Admin', 2, 'admin-token', 'a405639834b863a5f9faa8a04c9e624750f2cf962584eb8078039a7c2e094154', '[\"*\"]', '2026-01-11 00:12:35', NULL, '2026-01-11 00:06:17', '2026-01-11 00:12:35'),
+(29, 'App\\Models\\User', 13, 'api-token', 'f877d022be47f88463d4ba1455054517022d4fcb9dad82b15526afdfe54b244e', '[\"*\"]', '2026-01-11 04:33:09', NULL, '2026-01-11 04:32:12', '2026-01-11 04:33:09'),
+(30, 'App\\Models\\Admin', 2, 'admin-token', '54b188b2ad1d1cc4e84ebb8ef374dfc27c08a67be96f32941ad69a4c2e59dffe', '[\"*\"]', '2026-01-11 06:23:38', NULL, '2026-01-11 04:38:21', '2026-01-11 06:23:38'),
+(31, 'App\\Models\\User', 14, 'api-token', '9f830d6c5ba9c63163f22f2d5c28a5049efc062152e986d29b7d80eb761b7b1f', '[\"*\"]', '2026-01-11 20:34:13', NULL, '2026-01-11 20:33:23', '2026-01-11 20:34:13'),
+(32, 'App\\Models\\User', 14, 'api-token', 'aedb589057c46b86301e8609295959153ff6c0b5f3d13f0bc35f3b604c1d44d0', '[\"*\"]', '2026-01-11 20:35:56', NULL, '2026-01-11 20:35:52', '2026-01-11 20:35:56'),
+(33, 'App\\Models\\Admin', 2, 'admin-token', '286257ca26263e8452112d0a4363f7735fea6895df588a0e72cfd67ecf118318', '[\"*\"]', '2026-01-11 20:44:29', NULL, '2026-01-11 20:36:22', '2026-01-11 20:44:29'),
+(34, 'App\\Models\\Admin', 2, 'admin-token', 'c5ae2380fde001f9a7cae7774f01c87d399e486a6f8275c97b9cc94c747e0faa', '[\"*\"]', '2026-01-11 22:14:34', NULL, '2026-01-11 22:14:30', '2026-01-11 22:14:34'),
+(35, 'App\\Models\\User', 2, 'api-token', '125809f528a0c8575b3a59ae0c9db35bd596e0f15bc32e444669f00f9537f5c8', '[\"*\"]', '2026-01-11 22:15:26', NULL, '2026-01-11 22:14:56', '2026-01-11 22:15:26'),
+(36, 'App\\Models\\User', 2, 'api-token', '09be0163b2ea00e65f590084054856ac1e5386d4b15870767788f008e43cb5fa', '[\"*\"]', '2026-01-12 07:44:34', NULL, '2026-01-12 07:44:30', '2026-01-12 07:44:34'),
+(37, 'App\\Models\\User', 2, 'api-token', 'c48935066771fa3f816f084e33c2782d1cfaec97087a36c11ad16982659568ce', '[\"*\"]', '2026-01-12 21:08:06', NULL, '2026-01-12 21:08:02', '2026-01-12 21:08:06'),
+(38, 'App\\Models\\User', 2, 'api-token', '7bf2b6ee0676ec300dfd8920c9010d59a29c4f99bc7554be15fc0872ef3d8264', '[\"*\"]', NULL, NULL, '2026-01-12 21:08:03', '2026-01-12 21:08:03'),
+(39, 'App\\Models\\User', 15, 'api-token', 'bb6d5925b50ce566fab4479c28a962eb9b5b50d9ee94a1d0b6998ba07cee9a49', '[\"*\"]', '2026-01-12 21:10:55', NULL, '2026-01-12 21:10:23', '2026-01-12 21:10:55'),
+(41, 'App\\Models\\User', 15, 'api-token', '6eaea5ab6aa5df1a4ad268e37b43ce49920f0b034d6fb9e9b1e1223556cb718b', '[\"*\"]', '2026-01-13 05:00:13', NULL, '2026-01-13 04:59:26', '2026-01-13 05:00:13'),
+(42, 'App\\Models\\User', 15, 'api-token', '82d353ec2ab012341b378628a9413072095fe4a8821c9c393bbed6607a5ebbe7', '[\"*\"]', '2026-01-13 05:03:29', NULL, '2026-01-13 05:03:26', '2026-01-13 05:03:29'),
+(44, 'App\\Models\\User', 15, 'api-token', '4ab01d1af36a7cc93a201f8e122cc34ac1607e419f1c27a61b1608d35e050a15', '[\"*\"]', '2026-01-13 20:42:47', NULL, '2026-01-13 20:42:42', '2026-01-13 20:42:47'),
+(45, 'App\\Models\\User', 2, 'api-token', '10def56cd76e3008b80625e801baf18df19d0aaf9ab75a200dfb7f34c6785e5d', '[\"*\"]', '2026-01-14 04:24:24', NULL, '2026-01-14 04:23:42', '2026-01-14 04:24:24'),
+(46, 'App\\Models\\User', 2, 'api-token', '077d6b8f50dbc1774229a7116b7949cee598fa59dc877f4563e6fdd9a3269e0d', '[\"*\"]', '2026-01-14 04:26:04', NULL, '2026-01-14 04:26:01', '2026-01-14 04:26:04'),
+(48, 'App\\Models\\User', 15, 'api-token', 'dacfa03b6df5472c18947a75e7271f6d11a49d496eb445f920642b5048f2002b', '[\"*\"]', '2026-01-14 09:30:45', NULL, '2026-01-14 09:30:10', '2026-01-14 09:30:45'),
+(49, 'App\\Models\\User', 15, 'api-token', '30e348ed8ca882ff19d1265e435d49b5f1da80eef99b2caeb74b81e0b22e8a35', '[\"*\"]', NULL, NULL, '2026-01-14 09:30:11', '2026-01-14 09:30:11'),
+(50, 'App\\Models\\Admin', 2, 'admin-token', 'd4ca82530a7745572ca1a719183a4afc2972f66bc4182f331b9ab5957b6b2d1f', '[\"*\"]', '2026-01-14 09:31:22', NULL, '2026-01-14 09:31:20', '2026-01-14 09:31:22'),
+(51, 'App\\Models\\User', 16, 'api-token', '2cb20cc24c23f7d25e41976f08d4e932f3138d2a4d037cd859344dd9c2fa8dc2', '[\"*\"]', '2026-01-14 20:31:08', NULL, '2026-01-14 20:30:21', '2026-01-14 20:31:08'),
+(52, 'App\\Models\\User', 2, 'api-token', '2b838585a8881ce501a0b0316de7ebceebd8f375c2fd6477946ddd483f3f7ee0', '[\"*\"]', '2026-01-14 20:32:34', NULL, '2026-01-14 20:32:30', '2026-01-14 20:32:34'),
+(55, 'App\\Models\\User', 2, 'api-token', 'aa889ba5710f81cd4e10bd0becb75bbb4d6e311ba12432065084f9672987c907', '[\"*\"]', '2026-01-14 23:31:10', NULL, '2026-01-14 23:31:07', '2026-01-14 23:31:10'),
+(56, 'App\\Models\\User', 2, 'api-token', 'ae60f0ff79f673352474e16aeac28d01b69a713f42fa79e8175d30a140a4893e', '[\"*\"]', '2026-01-15 05:45:02', NULL, '2026-01-15 05:38:35', '2026-01-15 05:45:02'),
+(57, 'App\\Models\\User', 2, 'api-token', 'e1e072a50924ba7165cb6b882e1f0c6bf6a4a61bf4a390100da4d6faae9c20f8', '[\"*\"]', '2026-01-15 05:47:39', NULL, '2026-01-15 05:47:37', '2026-01-15 05:47:39'),
+(59, 'App\\Models\\Admin', 2, 'admin-token', '1d17a9f4cdcca88b253f5e497dc0359dc8577359a4265807856ae7e98e1567b6', '[\"*\"]', '2026-01-15 05:50:48', NULL, '2026-01-15 05:50:43', '2026-01-15 05:50:48'),
+(60, 'App\\Models\\User', 15, 'api-token', '49e8b7841df1dff6041ba75787287982af196213aabdca290824c8498373e596', '[\"*\"]', '2026-01-15 07:32:10', NULL, '2026-01-15 07:32:07', '2026-01-15 07:32:10'),
+(61, 'App\\Models\\User', 15, 'api-token', 'b932254883f0831d951d67e29b0c9f3ea2eb6d02c082f0e4cdc6799a46473b81', '[\"*\"]', NULL, NULL, '2026-01-15 07:32:08', '2026-01-15 07:32:08'),
+(62, 'App\\Models\\User', 17, 'api-token', 'd2522db4538472353760183fcf22e6da0ceca17b42e12ec40d80491fd19d9982', '[\"*\"]', '2026-01-15 19:54:29', NULL, '2026-01-15 19:53:47', '2026-01-15 19:54:29');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `sarans`
+-- Table structure for table `sarans`
 --
 
 CREATE TABLE `sarans` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `nama` varchar(255) DEFAULT NULL,
-  `email` varchar(255) DEFAULT NULL,
-  `pesan` text NOT NULL,
+  `id` bigint UNSIGNED NOT NULL,
+  `nama` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `pesan` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data untuk tabel `sarans`
+-- Dumping data for table `sarans`
 --
 
 INSERT INTO `sarans` (`id`, `nama`, `email`, `pesan`, `created_at`, `updated_at`) VALUES
-(2, 'chandra dwiky', 'chandra@gmail.com', 'keren, semangat', '2026-01-10 23:37:35', '2026-01-10 23:37:35'),
-(4, 'silvy', 'silvy@gmail.com', 'sudah bagus banget, semangatttt', '2026-01-10 23:58:19', '2026-01-10 23:58:19');
+(4, 'silvy', 'silvy@gmail.com', 'sudah bagus banget, semangatttt', '2026-01-10 23:58:19', '2026-01-10 23:58:19'),
+(6, 'tyass', 'tyas@gmail.com', 'josjiss', '2026-01-11 20:44:21', '2026-01-11 20:44:21'),
+(7, 'salsa', 'salsa@gmail.com', 'bagusss', '2026-01-14 04:27:49', '2026-01-14 04:27:49'),
+(8, 'raja', 'raja@gmail.com', 'baguss', '2026-01-14 20:29:16', '2026-01-14 20:29:16'),
+(9, 'riska', 'riska@gmail.com', 'sudah keren', '2026-01-15 05:50:19', '2026-01-15 05:50:19'),
+(10, 'zilaya', 'zila@gmail.com', 'sudah oke ini', '2026-01-15 19:51:55', '2026-01-15 19:51:55');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `users`
+-- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
+  `id` bigint UNSIGNED NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
-  `password` varchar(255) NOT NULL,
-  `remember_token` varchar(100) DEFAULT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `role` varchar(255) NOT NULL DEFAULT 'user'
+  `role` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'user'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data untuk tabel `users`
+-- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`, `role`) VALUES
-(2, 'sofi anjarwati', 'sofianjarwati0@gmail.com', NULL, '$2y$10$dnsSrLO8FS.ZqehBMOCysOKAMeXys4ES.6/vStYBYj4tUjb2Z5z9e', NULL, '2026-01-09 10:22:43', '2026-01-09 10:22:43', 'user'),
+(2, 'sofi anjarwati', 'sofianjarwati0@gmail.com', NULL, '$2y$10$h5FzL4pUn2hlBVFp4FmLtOSnfIXBt7rpmJVs9.hJFtqIP2Eih/T3m', NULL, '2026-01-09 10:22:43', '2026-01-15 05:47:19', 'user'),
 (3, 'sofi anjarwati', 'sofianjarwatii0@gmail.com', NULL, '$2y$10$8alTFrVuZiNo9qynRVRHou2IIZLubtUdah/aFELwoVH69/gIY66Y6', NULL, '2026-01-09 20:54:36', '2026-01-09 20:54:36', 'user'),
 (5, 'sofi anjarwati', 'sofianjarwa0@gmail.com', NULL, '$2y$10$K3dhfSlDlMo9Hb69niTJXu8xzb49/rr.UBfwsdq9ZI8.Vsa22S3o.', NULL, '2026-01-09 21:49:55', '2026-01-09 21:49:55', 'user'),
-(7, 'chandra dwiky', 'chandra@gmail.com', NULL, '$2y$10$XAQb.0DIn1IH70q94q6DlOZOAfaJWgCDeCye0aax9/8nPOkhuZBzG', NULL, '2026-01-09 23:40:13', '2026-01-09 23:40:13', 'user'),
 (8, 'sofia', 'sopik@gmail.com', NULL, '$2y$10$sgkFV6ULxML0we/BiWFc3uLlakXm70nTvcqIOqQOpTW.XRp/k3N6.', NULL, '2026-01-10 00:59:46', '2026-01-10 00:59:46', 'user'),
 (9, 'ebrahim', 'ebra@gmail.com', NULL, '$2y$10$NPLPFZEYWK/BfikBJ4YixuHQs2w4XqVxjCQhEldsCloM9s9OFzLqq', NULL, '2026-01-10 19:50:48', '2026-01-10 19:50:48', 'user'),
 (10, 'sofi anjarwati', 'sofia0@gmail.com', NULL, '$2y$10$MbUcLolXVaH3YF5ywK0RyejLRSNwv3hbLXehGTt4YklAWYf/2qiJa', NULL, '2026-01-10 21:20:03', '2026-01-10 21:20:03', 'user'),
-(12, 'silvy', 'ajwsofi@gmail.com', NULL, '$2y$10$Zdq.UqqLnFRqd8SHWSngg.rbYQ8moIbmYcFS/QWpab0lxizvq.sQi', NULL, '2026-01-10 23:59:32', '2026-01-11 00:03:51', 'user');
+(12, 'silvy', 'ajwsofi@gmail.com', NULL, '$2y$10$Zdq.UqqLnFRqd8SHWSngg.rbYQ8moIbmYcFS/QWpab0lxizvq.sQi', NULL, '2026-01-10 23:59:32', '2026-01-11 00:03:51', 'user'),
+(13, 'copi', 'copicaurush@gmail.com', NULL, '$2y$10$OoJuDKYkUfXTr1Pf5YJYfOXGRvmjHwsdGDdd3gNbrykIYbvA5kpwa', NULL, '2026-01-11 04:31:41', '2026-01-11 04:37:44', 'user'),
+(14, 'tyasarah', 'L200220235@student.ums.ac.id', NULL, '$2y$10$MNioH7C66zpu6b8DnbFDTu3tyVGuDVN7kd5/17JEhrgn4bv8f4Jh6', NULL, '2026-01-11 20:32:56', '2026-01-11 20:35:31', 'user'),
+(15, 'sovia', 'sofiajw75@gmail.com', NULL, '$2y$10$4Jo7aAIXPZS1r/b0na5uOOn2rZFLdGknsyObpYgZtQ1ESvbSNnMGO', NULL, '2026-01-12 21:10:06', '2026-01-13 05:02:59', 'user'),
+(16, 'keysia', 'keysia@gmail.com', NULL, '$2y$10$RIYyiRsi6AvoVIZguFNDIuIv4YIBcFR0fFDclP.59B7mVC3PjSI.a', NULL, '2026-01-14 20:30:06', '2026-01-14 20:30:06', 'user'),
+(17, 'sopia', 'sopiq@gmail.com', NULL, '$2y$10$/oWt58TuwY89SjKwjuhT9e4I9Xxjd.YZK4GTjP7eJ2X3r0e6o3KcO', NULL, '2026-01-15 19:53:26', '2026-01-15 19:53:26', 'user');
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indeks untuk tabel `admins`
+-- Indexes for table `admins`
 --
 ALTER TABLE `admins`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `admins_email_unique` (`email`);
 
 --
--- Indeks untuk tabel `data_kesehatans`
+-- Indexes for table `data_kesehatans`
 --
 ALTER TABLE `data_kesehatans`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `failed_jobs`
+-- Indexes for table `failed_jobs`
 --
 ALTER TABLE `failed_jobs`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`);
 
 --
--- Indeks untuk tabel `hasil_prediksi`
+-- Indexes for table `hasil_prediksi`
 --
 ALTER TABLE `hasil_prediksi`
   ADD PRIMARY KEY (`id`),
@@ -326,19 +389,19 @@ ALTER TABLE `hasil_prediksi`
   ADD KEY `fk_user` (`user_id`);
 
 --
--- Indeks untuk tabel `migrations`
+-- Indexes for table `migrations`
 --
 ALTER TABLE `migrations`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `password_resets`
+-- Indexes for table `password_resets`
 --
 ALTER TABLE `password_resets`
   ADD PRIMARY KEY (`email`);
 
 --
--- Indeks untuk tabel `personal_access_tokens`
+-- Indexes for table `personal_access_tokens`
 --
 ALTER TABLE `personal_access_tokens`
   ADD PRIMARY KEY (`id`),
@@ -346,76 +409,76 @@ ALTER TABLE `personal_access_tokens`
   ADD KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`);
 
 --
--- Indeks untuk tabel `sarans`
+-- Indexes for table `sarans`
 --
 ALTER TABLE `sarans`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `users`
+-- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `users_email_unique` (`email`);
 
 --
--- AUTO_INCREMENT untuk tabel yang dibuang
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT untuk tabel `admins`
+-- AUTO_INCREMENT for table `admins`
 --
 ALTER TABLE `admins`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT untuk tabel `data_kesehatans`
+-- AUTO_INCREMENT for table `data_kesehatans`
 --
 ALTER TABLE `data_kesehatans`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
--- AUTO_INCREMENT untuk tabel `failed_jobs`
+-- AUTO_INCREMENT for table `failed_jobs`
 --
 ALTER TABLE `failed_jobs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT untuk tabel `hasil_prediksi`
+-- AUTO_INCREMENT for table `hasil_prediksi`
 --
 ALTER TABLE `hasil_prediksi`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
--- AUTO_INCREMENT untuk tabel `migrations`
+-- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
--- AUTO_INCREMENT untuk tabel `personal_access_tokens`
+-- AUTO_INCREMENT for table `personal_access_tokens`
 --
 ALTER TABLE `personal_access_tokens`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
--- AUTO_INCREMENT untuk tabel `sarans`
+-- AUTO_INCREMENT for table `sarans`
 --
 ALTER TABLE `sarans`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
--- AUTO_INCREMENT untuk tabel `users`
+-- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
--- Ketidakleluasaan untuk tabel pelimpahan (Dumped Tables)
+-- Constraints for dumped tables
 --
 
 --
--- Ketidakleluasaan untuk tabel `hasil_prediksi`
+-- Constraints for table `hasil_prediksi`
 --
 ALTER TABLE `hasil_prediksi`
   ADD CONSTRAINT `fk_data_kesehatan` FOREIGN KEY (`data_kesehatan_id`) REFERENCES `data_kesehatans` (`id`) ON DELETE SET NULL,
