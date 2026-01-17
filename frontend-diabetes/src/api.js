@@ -1,15 +1,16 @@
 import axios from "axios";
 
+
 const api = axios.create({
-  baseURL: "http://127.0.0.1:8000/api",
-  withCredentials: false, // penting: kita pakai Bearer token, bukan cookie
+  baseURL: "https://api-preddia.pribumics.my.id/api",
+  
+  withCredentials: false, 
   headers: {
     Accept: "application/json",
     "Content-Type": "application/json",
   },
 });
 
-// 🔐 inject token ke setiap request
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -24,5 +25,13 @@ api.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+export const flaskApi = axios.create({
+  baseURL: "https://inandraaf.pythonanywhere.com",
+  
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 export default api;

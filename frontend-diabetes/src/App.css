@@ -2516,3 +2516,57 @@ main a.badge:active{
   transform: translateY(0);
 }
 
+/* =========================
+   GLOBAL RESPONSIVE FIX
+   ========================= */
+* { box-sizing: border-box; }
+html, body { width: 100%; overflow-x: hidden; }
+
+/* =========================
+   FIX: grid children boleh mengecil (penting untuk tabel/scroll di dalam grid)
+   ========================= */
+.grid-min0 > * { min-width: 0; }
+
+/* =========================
+   FIX: horizontal scroll container (kayak contoh bisa digeser)
+   Pakai wrapper class: .x-scroll
+   ========================= */
+.x-scroll{
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  display: block;
+  touch-action: pan-x;
+  padding-bottom: 6px;
+}
+
+.x-scroll table{
+  width: max-content !important;  /* biar nggak dipaksa 100% */
+  min-width: 900px;               /* paksa overflow -> pasti bisa geser */
+  border-collapse: collapse;
+}
+
+.x-scroll th,
+.x-scroll td{
+  white-space: nowrap;
+}
+
+/* =========================
+   MOBILE: padding halaman biar nggak sempit
+   ========================= */
+@media (max-width: 768px){
+  .page-pad{
+    padding: 16px !important;
+  }
+
+  /* Sidebar/menu admin biar bisa digeser */
+  .admin-sidebar, .sidebar, .side-menu, .admin-menu{
+    height: 100vh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+

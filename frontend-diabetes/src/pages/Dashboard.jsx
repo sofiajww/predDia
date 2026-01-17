@@ -1,6 +1,6 @@
 // src/pages/Dashboard.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import api from "../api";
+import api, { flaskApi } from "../api";
 
 // Komponen kecil untuk ikon info + tooltip (CLICK TO TOGGLE)
 function Info({ text }) {
@@ -92,16 +92,37 @@ const thStyle = {
   textAlign: "left",
   padding: "6px 10px",
   borderBottom: "1px solid #ddd",
+  whiteSpace: "nowrap",
 };
 
 const tdStyle = {
   padding: "6px 10px",
   borderBottom: "1px solid #eee",
+  whiteSpace: "nowrap",
 };
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [lang, setLang] = useState("id");
+
+  // RESPONSIVE helper
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 768px)").matches
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)");
+    const handleChange = (e) => setIsMobile(e.matches);
+
+    if (mq.addEventListener) mq.addEventListener("change", handleChange);
+    else mq.addListener(handleChange);
+
+    return () => {
+      if (mq.removeEventListener) mq.removeEventListener("change", handleChange);
+      else mq.removeListener(handleChange);
+    };
+  }, []);
 
   const [form, setForm] = useState({
     Pregnancies: "",
@@ -220,20 +241,18 @@ export default function Dashboard() {
   );
 
   const loadRiwayat = async () => {
-  try {
-    const res = await api.get("/prediksi/riwayat");
-    // res.data = { message, data: [...] }
-    if (res.data && Array.isArray(res.data.data)) {
-      setRiwayat(res.data.data); // <-- ambil array dari data
-    } else {
-      setRiwayat([]); // fallback supaya .map() aman
+    try {
+      const res = await api.get("/prediksi/riwayat");
+      if (res.data && Array.isArray(res.data.data)) {
+        setRiwayat(res.data.data);
+      } else {
+        setRiwayat([]);
+      }
+    } catch (err) {
+      console.error("Gagal load riwayat:", err);
+      setRiwayat([]);
     }
-  } catch (err) {
-    console.error("Gagal load riwayat:", err);
-    setRiwayat([]); // fallback
-  }
-};
-
+  };
 
   useEffect(() => {
     loadRiwayat();
@@ -256,42 +275,46 @@ export default function Dashboard() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    setHasilTerakhir(null);
+  e.preventDefault();
+  setLoading(true);
+  setError("");
+  setHasilTerakhir(null);
 
-    try {
-      const res = await api.post("/prediksi", {
-        Pregnancies: Number(form.Pregnancies),
-        Glucose: Number(form.Glucose),
-        BloodPressure: Number(form.BloodPressure),
-        SkinThickness: Number(form.SkinThickness),
-        Insulin: Number(form.Insulin),
-        BMI: Number(form.BMI),
-        DiabetesPedigreeFunction: Number(form.DiabetesPedigreeFunction),
-        Age: Number(form.Age),
-      });
+  try {
+    // ✅ PREDIKSI KE FLASK (bukan ke Laravel)
+    const res = await flaskApi.post("/predict", {
+      Pregnancies: Number(form.Pregnancies),
+      Glucose: Number(form.Glucose),
+      BloodPressure: Number(form.BloodPressure),
+      SkinThickness: Number(form.SkinThickness),
+      Insulin: Number(form.Insulin),
+      BMI: Number(form.BMI),
+      DiabetesPedigreeFunction: Number(form.DiabetesPedigreeFunction),
+      Age: Number(form.Age),
+    });
 
-      const raw = res.data?.hasil ?? res.data?.prediction;
-      const rawStr = String(raw).toLowerCase();
+    const raw = res.data?.hasil ?? res.data?.prediction;
+    const rawStr = String(raw).toLowerCase();
 
-      let kategori = 0;
-      if (raw === 1 || rawStr.includes("positif")) kategori = 1;
+    let kategori = 0;
+    if (raw === 1 || rawStr.includes("positif")) kategori = 1;
 
-      setHasilTerakhir(kategori);
-      loadRiwayat();
-    } catch (err) {
-      console.error("ERROR:", err.response?.data);
-      setError(
-        lang === "id"
-          ? "Terjadi kesalahan saat prediksi."
-          : "An error occurred during prediction."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+    setHasilTerakhir(kategori);
+
+    // ✅ riwayat tetap ambil dari Laravel
+    loadRiwayat();
+  } catch (err) {
+    console.error("ERROR:", err.response?.data);
+    setError(
+      lang === "id"
+        ? "Terjadi kesalahan saat prediksi."
+        : "An error occurred during prediction."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -299,7 +322,6 @@ export default function Dashboard() {
     window.location.href = "/login";
   };
 
-  // Pesan hasil: dihitung saat render (bukan state) => otomatis ikut ganti bahasa
   const pesanHasil =
     hasilTerakhir === null
       ? ""
@@ -381,8 +403,9 @@ export default function Dashboard() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1.5fr 2fr",
+            gridTemplateColumns: isMobile ? "1fr" : "1.5fr 2fr",
             gap: 24,
+            minWidth: 0, // ✅ KUNCI: biar child grid bisa mengecil
           }}
         >
           {/* FORM */}
@@ -392,6 +415,7 @@ export default function Dashboard() {
               padding: 24,
               borderRadius: 12,
               boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+              minWidth: 0, // ✅ aman
             }}
           >
             <h3>{labelText[lang].formTitle}</h3>
@@ -435,7 +459,7 @@ export default function Dashboard() {
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
+                  gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
                   gap: 12,
                 }}
               >
@@ -451,6 +475,7 @@ export default function Dashboard() {
                       {fieldMeta[key].label[lang]}
                       <Info text={fieldMeta[key].help} />
                     </label>
+
                     <input
                       name={key}
                       type="number"
@@ -500,6 +525,7 @@ export default function Dashboard() {
               padding: 24,
               borderRadius: 12,
               boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+              minWidth: 0, // ✅ KUNCI: biar scroll di dalamnya bisa jalan
             }}
           >
             <h3>{labelText[lang].riwayat}</h3>
@@ -507,36 +533,68 @@ export default function Dashboard() {
             {riwayat.length === 0 ? (
               <p>{lang === "id" ? "Tidak ada riwayat." : "No history yet."}</p>
             ) : (
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead>
-                  <tr>
-                    <th style={thStyle}>Tanggal</th>
-                    <th style={thStyle}>Hasil</th>
-                    <th style={thStyle}>Glucose</th>
-                    <th style={thStyle}>BMI</th>
-                    <th style={thStyle}>Age</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Array.isArray(riwayat) && riwayat.length > 0 ? (
-  riwayat.map((r) => (
-    <tr key={r.id}>
-      <td style={tdStyle}>{r.created_at}</td>
-      <td style={tdStyle}>{r.hasil}</td>
-      <td style={tdStyle}>{r.data_kesehatan?.Glucose}</td>
-      <td style={tdStyle}>{r.data_kesehatan?.BMI}</td>
-      <td style={tdStyle}>{r.data_kesehatan?.Age}</td>
-    </tr>
-  ))
-) : (
+              <div
+                style={{
+                  width: "100%",
+                  maxWidth: "100%",
+                  minWidth: 0, // ✅ KUNCI
+                  overflowX: "auto",
+                  overflowY: "hidden",
+                  WebkitOverflowScrolling: "touch",
+                  display: "block",
+                  touchAction: "pan-x", // ✅ biar swipe kiri/kanan kebaca di HP
+                  paddingBottom: 6,
+                }}
+              >
+                <table
+                  style={{
+                    width: "max-content",
+                    minWidth: 700,
+                    borderCollapse: "collapse",
+                  }}
+                >
+                  <thead>
   <tr>
-    <td colSpan={5} style={{ textAlign: "center", padding: 12 }}>
-      {lang === "id" ? "Tidak ada riwayat." : "No history yet."}
-    </td>
+    <th style={thStyle}>Tanggal</th>
+    <th style={thStyle}>Hasil</th>
+    <th style={thStyle}>Preg</th>
+    <th style={thStyle}>Glucose</th>
+    <th style={thStyle}>BP</th>
+    <th style={thStyle}>Skin</th>
+    <th style={thStyle}>Insulin</th>
+    <th style={thStyle}>BMI</th>
+    <th style={thStyle}>DPF</th>
+    <th style={thStyle}>Age</th>
   </tr>
-)}
-                </tbody>
-              </table>
+</thead>
+
+
+                 <tbody>
+  {Array.isArray(riwayat) && riwayat.length > 0 ? (
+    riwayat.map((r) => (
+      <tr key={r.id}>
+        <td style={tdStyle}>{r.created_at}</td>
+        <td style={tdStyle}>{r.hasil}</td>
+        <td style={tdStyle}>{r.data_kesehatan?.Pregnancies}</td>
+        <td style={tdStyle}>{r.data_kesehatan?.Glucose}</td>
+        <td style={tdStyle}>{r.data_kesehatan?.BloodPressure}</td>
+        <td style={tdStyle}>{r.data_kesehatan?.SkinThickness}</td>
+        <td style={tdStyle}>{r.data_kesehatan?.Insulin}</td>
+        <td style={tdStyle}>{r.data_kesehatan?.BMI}</td>
+        <td style={tdStyle}>{r.data_kesehatan?.DiabetesPedigreeFunction}</td>
+        <td style={tdStyle}>{r.data_kesehatan?.Age}</td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan={10} style={{ textAlign: "center", padding: 12 }}>
+        {lang === "id" ? "Tidak ada riwayat." : "No history yet."}
+      </td>
+    </tr>
+  )}
+</tbody>
+                </table>
+              </div>
             )}
           </section>
         </div>

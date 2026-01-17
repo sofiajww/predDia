@@ -291,30 +291,33 @@ export default function AdminDashboard() {
         <div style={{ ...styles.alert, ...styles.alertError }}>{dashErr}</div>
       ) : null}
 
-      <div style={styles.grid4}>
-        {statCards.map((c) => (
-          <div key={c.title} style={styles.card(THEME)}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-              <div>
-                <div style={styles.label}>{c.title.toUpperCase()}</div>
-                <div style={styles.value(THEME)}>{dashLoading ? "…" : c.value}</div>
-                <div style={styles.note(THEME)}>{c.note}</div>
-              </div>
-              <div style={styles.iconBox(THEME)}>{c.icon}</div>
-            </div>
-            <div
-              style={{
-                height: 4,
-                background: c.accent,
-                borderRadius: 999,
-                width: "42%",
-                marginTop: 12,
-              }}
-            />
+      <div style={styles.mobileScrollX}>
+  <div style={styles.grid4}>
+    {statCards.map((c) => (
+      <div key={c.title} style={styles.card(THEME)}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+          <div>
+            <div style={styles.label}>{c.title.toUpperCase()}</div>
+            <div style={styles.value(THEME)}>{dashLoading ? "…" : c.value}</div>
+            <div style={styles.note(THEME)}>{c.note}</div>
           </div>
-        ))}
+          <div style={styles.iconBox(THEME)}>{c.icon}</div>
+        </div>
+        <div
+          style={{
+            height: 4,
+            background: c.accent,
+            borderRadius: 999,
+            width: "42%",
+            marginTop: 12,
+          }}
+        />
       </div>
+    ))}
+  </div>
+</div>
 
+      <div style={styles.mobileScrollX}></div>
       <div style={styles.grid2}>
         <div style={styles.card(THEME)}>
           <div
@@ -412,8 +415,29 @@ export default function AdminDashboard() {
 }
 
 const styles = {
-  grid4: { display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 16, marginTop: 16 },
-  grid2: { display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16, marginTop: 16 },
+  mobileScrollX: {
+    width: "100%",
+    maxWidth: "100%",
+    overflowX: "auto",
+    overflowY: "hidden",
+    WebkitOverflowScrolling: "touch",
+  },
+
+  grid4: {
+    display: "grid",
+    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+    gap: 16,
+    marginTop: 16,
+    minWidth: 720, // ✅ PAKSA MELEBAR BIAR MOBILE BISA GESER
+  },
+
+  grid2: {
+    display: "grid",
+    gridTemplateColumns: "2fr 1fr",
+    gap: 16,
+    marginTop: 16,
+    minWidth: 720, // ✅ PAKSA MELEBAR BIAR MOBILE BISA GESER
+  },
 
   card: (T) => ({
     background: T.white,
@@ -457,6 +481,16 @@ const styles = {
     border: `1px solid ${T.border}`,
   }),
 
-  alert: { marginTop: 12, padding: 12, borderRadius: 12, fontWeight: 800, fontSize: 13 },
-  alertError: { background: "#fef2f2", border: "1px solid #fecaca", color: "#991b1b" },
+  alert: {
+    marginTop: 12,
+    padding: 12,
+    borderRadius: 12,
+    fontWeight: 800,
+    fontSize: 13,
+  },
+  alertError: {
+    background: "#fef2f2",
+    border: "1px solid #fecaca",
+    color: "#991b1b",
+  },
 };

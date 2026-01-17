@@ -1,20 +1,18 @@
 <?php
 
-    return [
+return [
 
-    'paths' => [
-        'api/*',
-        'login',
-        'admin/login',
-        'sanctum/csrf-cookie'
-    ],
+    'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
         'http://localhost:3000',
-        'http://127.0.0.1:5173',
+        'http://127.0.0.1:3000',
+        'https://preddia.pribumics.my.id',
     ],
+
+    'allowed_origins_patterns' => [],
 
     'allowed_headers' => ['*'],
 
@@ -22,6 +20,5 @@
 
     'max_age' => 0,
 
-    'supports_credentials' => true,
-
+    'supports_credentials' => false, // ubah jadi true kalau pakai cookie session
 ];

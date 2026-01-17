@@ -1,9 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import api from "../api";
 
 export default function AdminLayout({ children }) {
   const loc = useLocation();
+  const [isMobile, setIsMobile] = useState(
+  typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches
+);
+
+useEffect(() => {
+  const mq = window.matchMedia("(max-width: 768px)");
+  const handler = (e) => setIsMobile(e.matches);
+
+  if (mq.addEventListener) mq.addEventListener("change", handler);
+  else mq.addListener(handler);
+
+  return () => {
+    if (mq.removeEventListener) mq.removeEventListener("change", handler);
+    else mq.removeListener(handler);
+  };
+}, []);
+
 
   const menu = [
     { label: "Dashboard", to: "/admin", icon: "🏠" },
@@ -32,9 +49,30 @@ export default function AdminLayout({ children }) {
   };
 
   return (
-    <div style={styles.app}>
+    <div
+  style={{
+    ...styles.app,
+    gridTemplateColumns: isMobile ? "1fr" : "260px 1fr",
+  }}
+>
       {/* SIDEBAR */}
-      <aside style={styles.sidebar}>
+      <aside
+  style={{
+    ...styles.sidebar,
+
+    // MOBILE OVERRIDE
+    ...(isMobile
+      ? {
+          borderRight: "none",
+          borderBottom: "1px solid #e5e7eb",
+          padding: 16,
+        }
+      : {
+          borderBottom: "none",
+        }),
+  }}
+>
+
         <div style={styles.brand}>
           <div style={styles.brandBadge}>PD</div>
           <div>
@@ -82,7 +120,17 @@ export default function AdminLayout({ children }) {
         </header>
 
         {/* CONTENT */}
-        <section style={styles.content}>{children}</section>
+        <section
+  style={{
+    ...styles.content,
+    minWidth: 0,
+    overflowX: "auto",
+    WebkitOverflowScrolling: "touch",
+  }}
+>
+  {children}
+</section>
+
       </main>
     </div>
   );
