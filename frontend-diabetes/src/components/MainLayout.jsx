@@ -9,6 +9,9 @@ export default function MainLayout() {
   const location = useLocation();
   const langWrapRef = useRef(null);
 
+  // ✅ HERO hanya muncul di landing
+  const isHome = location.pathname === "/";
+
   const activeKey = useMemo(() => {
     const p = location.pathname;
     if (p === "/") return "home";
@@ -29,17 +32,18 @@ export default function MainLayout() {
     () => [
       {
         src: "/images/hero-1.jpg",
-        pos: "center", // geser foto 1
+        pos: "center",
         size: "cover",
       },
       {
         src: "/images/hero-2.png",
-        pos: "50% 90%", // geser foto 2
+        pos: "50% 90%",
         size: "cover",
       },
       {
-        src: "/images/hero-3.png",
-        pos: "50% 10%", // geser foto 3
+        src: "/images/hero-2.png",
+        pos: "50% 90%",
+        posMobile: "80% 10%", // coba ini biar tangan lebih ke pojok
         size: "cover",
       },
     ],
@@ -49,7 +53,10 @@ export default function MainLayout() {
   const [heroIdx, setHeroIdx] = useState(0);
   const [heroFade, setHeroFade] = useState(false);
 
+  // ✅ BONUS: interval slideshow hanya jalan saat di halaman "/"
   useEffect(() => {
+    if (!isHome) return;
+
     const id = setInterval(() => {
       setHeroFade(true);
 
@@ -60,7 +67,7 @@ export default function MainLayout() {
     }, 6000);
 
     return () => clearInterval(id);
-  }, [heroSlides.length]);
+  }, [heroSlides.length, isHome]);
 
   const hero = heroSlides[heroIdx];
 
@@ -86,7 +93,6 @@ export default function MainLayout() {
   // ==================================================
   useEffect(() => {
     const runReveal = () => {
-      // 1) apply reveal ke target, KECUALI area no-reveal
       document
         .querySelectorAll(
           ".section-title, p, h1, h2, h3, h4, h5, h6, li, .product-item, .feature, .post-entry, .card, .col"
@@ -96,13 +102,11 @@ export default function MainLayout() {
           el.classList.add("reveal");
         });
 
-      // 2) ambil reveal yang bukan di no-reveal
       const elements = Array.from(document.querySelectorAll(".reveal")).filter(
         (el) => !el.closest(".no-reveal")
       );
       if (!elements.length) return;
 
-      // 3) reset show biar animasi tetap jalan pas scroll
       elements.forEach((el) => {
         const r = el.getBoundingClientRect();
         const inView = r.top < window.innerHeight * 0.92 && r.bottom > 0;
@@ -110,7 +114,6 @@ export default function MainLayout() {
         else el.classList.remove("show");
       });
 
-      // 4) observer
       const observer = new IntersectionObserver(
         (entries, obs) => {
           entries.forEach((entry) => {
@@ -133,7 +136,6 @@ export default function MainLayout() {
     const t2 = setTimeout(runReveal, 400);
     const t3 = setTimeout(runReveal, 900);
 
-    // observe perubahan konten, tapi batasi ke main-content biar footer ga kena
     const main = document.getElementById("main-content");
     const mo = new MutationObserver(() => runReveal());
     if (main) {
@@ -266,226 +268,222 @@ export default function MainLayout() {
         </div>
       </nav>
 
-      {/* HERO SLIDER */}
-      <div
-        id="prediaHeroCarousel"
-        className="carousel slide predia-hero-carousel"
-        data-bs-ride="carousel"
-      >
-        <div className="carousel-inner">
-          <div className="carousel-item active">
-            <div
-              className={`predia-hero-slide ${heroFade ? "hero-fade" : ""}`}
-              style={{
-                backgroundImage: `url(${hero.src})`,
-                backgroundPosition: hero.pos, // ✅ beda per foto
-                backgroundSize: hero.size, // ✅ bisa beda per foto
-              }}
-            >
-              <div className="predia-hero-overlay" />
-              <div className="container predia-hero-content">
-                <div className="row align-items-center justify-content-between">
-                  <div className="col-lg-7 col-xl-6">
-                    <div className="predia-hero-panel">
-                      {/* ✅ UPDATED: Typography lebih variatif (tidak monoton) */}
-                      <h1 className="predia-hero-title">
-                        {lang === "id" ? (
-                          <>
-                            Yuk,cek kondisi tubuhmu <br />
-                            <span className="predia-hero-highlight">
-                              sekarang!
-                            </span>{" "}
-                          </>
-                        ) : (
-                          <>
-                            Come on, check your body condition.{" "}
-                            <span className="predia-hero-highlight">
-                              Right now!
-                            </span>{" "}
-                            <br />
-                          </>
-                        )}
-                      </h1>
+      {/* ✅ HERO SLIDER (HANYA DI LANDING /) */}
+      {isHome && (
+        <div
+          id="prediaHeroCarousel"
+          className="carousel slide predia-hero-carousel"
+          data-bs-ride="carousel"
+        >
+          <div className="carousel-inner">
+            <div className="carousel-item active">
+              <div
+                className={`predia-hero-slide ${heroFade ? "hero-fade" : ""}`}
+                style={{
+  backgroundImage: `url(${hero.src})`,
+  backgroundSize: hero.size,
+  "--hero-pos": hero.pos,
+  "--hero-pos-mobile": hero.posMobile || hero.pos,
+}}
 
-                      <p className="predia-hero-text">
-                        {lang === "id"
-                          ? "Kenali dirimu lebih baik, mulai dari langkah sederhana."
-                          : "Quick screening using simple health data. Instant results + relevant suggestions."}
-                      </p>
+              >
+                <div className="predia-hero-overlay" />
+                <div className="container predia-hero-content">
+                  <div className="row align-items-center justify-content-between">
+                    <div className="col-lg-7 col-xl-6">
+                      <div className="predia-hero-panel">
+                        <h1 className="predia-hero-title">
+                          {lang === "id" ? (
+                            <>
+                              Yuk,cek kondisi tubuhmu <br />
+                              <span className="predia-hero-highlight">
+                                sekarang!
+                              </span>{" "}
+                            </>
+                          ) : (
+                            <>
+                              Come on, check your body condition.{" "}
+                              <span className="predia-hero-highlight">
+                                Right now!
+                              </span>{" "}
+                              <br />
+                            </>
+                          )}
+                        </h1>
 
-                      <div className="predia-hero-actions">
-                        <Link to="/login" className="btn btn-secondary me-2">
+                        <p className="predia-hero-text">
                           {lang === "id"
-                            ? "Mulai Prediksi"
-                            : "Start Prediction"}
-                        </Link>
-                        <Link
-                          to="/education"
-                          className="btn btn-white-outline"
-                        >
-                          {lang === "id"
-                            ? "Pelajari Diabetes"
-                            : "Learn Diabetes"}
-                        </Link>
+                            ? "Kenali dirimu lebih baik, mulai dari langkah sederhana."
+                            : "Quick screening using simple health data. Instant results + relevant suggestions."}
+                        </p>
+
+                        <div className="predia-hero-actions">
+                          <Link to="/login" className="btn btn-secondary me-2">
+                            {lang === "id"
+                              ? "Mulai Prediksi"
+                              : "Start Prediction"}
+                          </Link>
+                          <Link
+                            to="/education"
+                            className="btn btn-white-outline"
+                          >
+                            {lang === "id"
+                              ? "Pelajari Diabetes"
+                              : "Learn Diabetes"}
+                          </Link>
+                        </div>
                       </div>
                     </div>
+                    {/* kanan kosong */}
                   </div>
-                  {/* NOTE: kolom kanan kamu memang kosong dari awal (tidak dihapus) */}
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* ISI HALAMAN */}
       <div id="main-content">
         <Outlet context={{ lang, setLang }} />
       </div>
 
-{/* ================= FOOTER ================= */}
-<footer className="footer-section footer-compact no-reveal">
-  <div className="container">
-    {/* ===== TOP FOOTER ===== */}
-    <div className="row g-3 align-items-start">
-      {/* LEFT */}
-      <div className="col-lg-5">
-        <div className="footer-logo-wrap" style={{ marginBottom: 6 }}>
-          <Link to="/" className="footer-logo">
-            PredDia<span>.</span>
-          </Link>
-        </div>
+      {/* ================= FOOTER ================= */}
+      <footer className="footer-section footer-compact no-reveal">
+        <div className="container">
+          {/* ===== TOP FOOTER ===== */}
+          <div className="row g-3 align-items-start">
+            {/* LEFT */}
+            <div className="col-lg-5">
+              <div className="footer-logo-wrap" style={{ marginBottom: 6 }}>
+                <Link to="/" className="footer-logo">
+                  PredDia<span>.</span>
+                </Link>
+              </div>
 
-        <p
-          style={{
-            maxWidth: 420,
-            marginBottom: 12,
-            lineHeight: 1.55,
-          }}
-        >
-          {lang === "id"
-            ? "PredDia membantu melakukan skrining awal risiko diabetes berbasis data kesehatan sederhana. Hasil bukan diagnosis medis, namun dapat menjadi peringatan dini untuk langkah kesehatan yang lebih tepat."
-            : "PredDia helps provide early screening of diabetes risk using simple health data. Results are not a medical diagnosis, but can serve as an early alert for better health decisions."}
-        </p>
+              <p
+                style={{
+                  maxWidth: 420,
+                  marginBottom: 12,
+                  lineHeight: 1.55,
+                }}
+              >
+                {lang === "id"
+                  ? "PredDia membantu melakukan skrining awal risiko diabetes berbasis data kesehatan sederhana. Hasil bukan diagnosis medis, namun dapat menjadi peringatan dini untuk langkah kesehatan yang lebih tepat."
+                  : "PredDia helps provide early screening of diabetes risk using simple health data. Results are not a medical diagnosis, but can serve as an early alert for better health decisions."}
+              </p>
 
-        <ul
-          className="list-unstyled d-flex gap-2 mb-0"
-          style={{ marginTop: 6 }}
-        >
-          <li>
-            <a href="#fb" aria-label="Facebook">
-              <span className="fa fa-brands fa-facebook-f" />
-            </a>
-          </li>
-          <li>
-            <a href="#tw" aria-label="Twitter">
-              <span className="fa fa-brands fa-twitter" />
-            </a>
-          </li>
-          <li>
-            <a href="#ig" aria-label="Instagram">
-              <span className="fa fa-brands fa-instagram" />
-            </a>
-          </li>
-          <li>
-            <a href="#li" aria-label="LinkedIn">
-              <span className="fa fa-brands fa-linkedin" />
-            </a>
-          </li>
-        </ul>
-      </div>
-
-      {/* RIGHT */}
-      <div className="col-lg-7">
-        <div className="row g-2">
-          <div className="col-6 col-md-4">
-            <div style={{ fontWeight: 700, marginBottom: 6 }}>
-              Menu
+              <ul
+                className="list-unstyled d-flex gap-2 mb-0"
+                style={{ marginTop: 6 }}
+              >
+                <li>
+                  <a href="#fb" aria-label="Facebook">
+                    <span className="fa fa-brands fa-facebook-f" />
+                  </a>
+                </li>
+                <li>
+                  <a href="#tw" aria-label="Twitter">
+                    <span className="fa fa-brands fa-twitter" />
+                  </a>
+                </li>
+                <li>
+                  <a href="#ig" aria-label="Instagram">
+                    <span className="fa fa-brands fa-instagram" />
+                  </a>
+                </li>
+                <li>
+                  <a href="#li" aria-label="LinkedIn">
+                    <span className="fa fa-brands fa-linkedin" />
+                  </a>
+                </li>
+              </ul>
             </div>
-            <ul className="list-unstyled mb-0">
-              <li style={{ marginBottom: 6 }}>
-                <Link to="/education">Edukasi Diabetes</Link>
-              </li>
-              <li style={{ marginBottom: 6 }}>
-                <Link to="/risk-factors">Faktor Risiko & Pencegahan</Link>
-              </li>
-              <li style={{ marginBottom: 6 }}>
-                <Link to="/lifestyle">Gaya Hidup Sehat</Link>
-              </li>
-              <li>
-                <Link to="/about">Tentang Kami</Link>
-              </li>
-            </ul>
+
+            {/* RIGHT */}
+            <div className="col-lg-7">
+              <div className="row g-2">
+                <div className="col-6 col-md-4">
+                  <div style={{ fontWeight: 700, marginBottom: 6 }}>Menu</div>
+                  <ul className="list-unstyled mb-0">
+                    <li style={{ marginBottom: 6 }}>
+                      <Link to="/education">Edukasi Diabetes</Link>
+                    </li>
+                    <li style={{ marginBottom: 6 }}>
+                      <Link to="/risk-factors">Faktor Risiko & Pencegahan</Link>
+                    </li>
+                    <li style={{ marginBottom: 6 }}>
+                      <Link to="/lifestyle">Gaya Hidup Sehat</Link>
+                    </li>
+                    <li>
+                      <Link to="/about">Tentang Kami</Link>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="col-6 col-md-4">
+                  <div style={{ fontWeight: 700, marginBottom: 6 }}>Akun</div>
+                  <ul className="list-unstyled mb-0">
+                    <li style={{ marginBottom: 6 }}>
+                      <Link to="/login">Masuk</Link>
+                    </li>
+                    <li style={{ marginBottom: 6 }}>
+                      <Link to="/register">Daftar</Link>
+                    </li>
+                    <li>
+                      <Link to="/dashboard">Dashboard</Link>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="col-12 col-md-4">
+                  <div style={{ fontWeight: 700, marginBottom: 6 }}>
+                    Catatan
+                  </div>
+                  <p
+                    style={{
+                      marginBottom: 0,
+                      fontSize: 14,
+                      opacity: 0.9,
+                      lineHeight: 1.55,
+                    }}
+                  >
+                    Informasi pada PredDia bersifat edukatif dan tidak
+                    menggantikan konsultasi atau diagnosis dokter.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="col-6 col-md-4">
-            <div style={{ fontWeight: 700, marginBottom: 6 }}>
-              Akun
-            </div>
-            <ul className="list-unstyled mb-0">
-              <li style={{ marginBottom: 6 }}>
-                <Link to="/login">Masuk</Link>
-              </li>
-              <li style={{ marginBottom: 6 }}>
-                <Link to="/register">Daftar</Link>
-              </li>
-              <li>
-                <Link to="/dashboard">Dashboard</Link>
-              </li>
-            </ul>
-          </div>
-
-          <div className="col-12 col-md-4">
-            <div style={{ fontWeight: 700, marginBottom: 6 }}>
-              Catatan
-            </div>
-            <p
-              style={{
-                marginBottom: 0,
-                fontSize: 14,
-                opacity: 0.9,
-                lineHeight: 1.55,
-              }}
+          {/* ===== BOTTOM / COPYRIGHT ===== */}
+          <div className="border-top" style={{ marginTop: 16 }}>
+            <div
+              className="row align-items-center"
+              style={{ paddingTop: 12, paddingBottom: 10 }}
             >
-              Informasi pada PredDia bersifat edukatif dan tidak menggantikan
-              konsultasi atau diagnosis dokter.
-            </p>
+              <div className="col-lg-6 text-center text-lg-start">
+                <p className="mb-0">
+                  © {new Date().getFullYear()} <b>PredDia</b>. Seluruh hak cipta
+                  dilindungi.
+                </p>
+              </div>
+
+              <div className="col-lg-6 text-center text-lg-end">
+                <ul className="list-unstyled d-inline-flex gap-4 mb-0">
+                  <li>
+                    <a href="#terms">Ketentuan</a>
+                  </li>
+                  <li>
+                    <a href="#privacy">Privasi</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-
-    {/* ===== BOTTOM / COPYRIGHT ===== */}
-    <div
-      className="border-top"
-      style={{ marginTop: 16 }}
-    >
-      <div
-        className="row align-items-center"
-        style={{ paddingTop: 12, paddingBottom: 10 }}
-      >
-        <div className="col-lg-6 text-center text-lg-start">
-          <p className="mb-0">
-            © {new Date().getFullYear()} <b>PredDia</b>. Seluruh hak cipta
-            dilindungi.
-          </p>
-        </div>
-
-        <div className="col-lg-6 text-center text-lg-end">
-          <ul className="list-unstyled d-inline-flex gap-4 mb-0">
-            <li>
-              <a href="#terms">Ketentuan</a>
-            </li>
-            <li>
-              <a href="#privacy">Privasi</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</footer>
-{/* ================= END FOOTER ================= */}
+      </footer>
+      {/* ================= END FOOTER ================= */}
     </>
   );
 }

@@ -2,12 +2,11 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import api, { flaskApi } from "../api";
 
-// Komponen kecil untuk ikon info + tooltip (CLICK TO TOGGLE)
+// Komponen Info/Tooltip
 function Info({ text }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
-  // tutup tooltip kalau klik di luar
   useEffect(() => {
     const onDocClick = (e) => {
       if (!ref.current) return;
@@ -88,17 +87,36 @@ function Info({ text }) {
   );
 }
 
+// Helper untuk Format Tanggal (Indonesia)
+const formatTanggal = (isoString) => {
+  if (!isoString) return "-";
+  const date = new Date(isoString);
+  return new Intl.DateTimeFormat("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+};
+
 const thStyle = {
   textAlign: "left",
-  padding: "6px 10px",
-  borderBottom: "1px solid #ddd",
+  padding: "12px 16px", // Padding lebih lega
+  borderBottom: "2px solid #eee",
   whiteSpace: "nowrap",
+  color: "#666",
+  fontSize: "13px",
+  fontWeight: "bold",
+  textTransform: "uppercase",
 };
 
 const tdStyle = {
-  padding: "6px 10px",
-  borderBottom: "1px solid #eee",
+  padding: "12px 16px",
+  borderBottom: "1px solid #f0f0f0",
   whiteSpace: "nowrap",
+  fontSize: "14px",
+  color: "#333",
 };
 
 export default function Dashboard() {
@@ -119,7 +137,8 @@ export default function Dashboard() {
     else mq.addListener(handleChange);
 
     return () => {
-      if (mq.removeEventListener) mq.removeEventListener("change", handleChange);
+      if (mq.removeEventListener)
+        mq.removeEventListener("change", handleChange);
       else mq.removeListener(handleChange);
     };
   }, []);
@@ -140,9 +159,7 @@ export default function Dashboard() {
   const [error, setError] = useState("");
   const [riwayat, setRiwayat] = useState([]);
 
-  // ============================
   // TEXT TERJEMAHAN
-  // ============================
   const pesanPositif = useMemo(
     () => ({
       id: "Hasil menunjukkan Anda berisiko diabetes. Sebaiknya lakukan pemeriksaan lanjutan dan konsultasi dengan dokter atau fasilitas kesehatan terdekat.",
@@ -183,71 +200,85 @@ export default function Dashboard() {
     []
   );
 
-  // Penjelasan tooltip
-  const fieldMeta = useMemo(
-    () => ({
-      Pregnancies: {
-        label: { id: "Jumlah Kehamilan", en: "Pregnancies" },
-        help:
-          lang === "id"
-            ? "Jumlah kehamilan. Jika laki-laki isi 0."
-            : "Number of pregnancies. If male, fill 0.",
-      },
-      Glucose: {
-        label: { id: "Glukosa", en: "Glucose" },
-        help:
-          lang === "id"
-            ? "Kadar glukosa darah puasa (mg/dL)."
-            : "Fasting glucose level (mg/dL).",
-      },
-      BloodPressure: {
-        label: { id: "Tekanan Darah", en: "Blood Pressure" },
-        help:
-          lang === "id"
-            ? "Tekanan darah diastolik (mmHg)."
-            : "Diastolic blood pressure (mmHg).",
-      },
-      SkinThickness: {
-        label: { id: "Ketebalan Kulit", en: "Skin Thickness" },
-        help:
-          lang === "id"
-            ? "Ketebalan lipatan kulit triceps (mm)."
-            : "Triceps skin fold thickness (mm).",
-      },
-      Insulin: {
-        label: { id: "Insulin", en: "Insulin" },
-        help:
-          lang === "id"
-            ? "Konsentrasi insulin (mu U/ml)."
-            : "Insulin concentration (mu U/ml).",
-      },
-      BMI: {
-        label: { id: "BMI", en: "BMI" },
-        help: lang === "id" ? "Body Mass Index." : "Body Mass Index.",
-      },
-      DiabetesPedigreeFunction: {
-        label: { id: "DPF", en: "Diabetes Pedigree Function" },
-        help:
-          lang === "id"
-            ? "Indeks risiko berdasarkan riwayat keluarga."
-            : "Risk index based on family history.",
-      },
-      Age: {
-        label: { id: "Usia", en: "Age" },
-        help: lang === "id" ? "Usia dalam tahun." : "Age in years.",
-      },
-    }),
-    [lang]
-  );
+  // META DATA FIELD
+const fieldMeta = useMemo(
+  () => ({
+    Pregnancies: {
+      label: { id: "Jumlah Kehamilan", en: "Pregnancies" },
+      help:
+        lang === "id"
+          ? "Jumlah total kehamilan yang pernah dialami. Contoh: 0 (belum pernah hamil / pria), 1–3 (umum)."
+          : "Total number of pregnancies. Example: 0 (never pregnant / male), 1–3 (common).",
+    },
+
+    Glucose: {
+      label: { id: "Glukosa", en: "Glucose" },
+      help:
+        lang === "id"
+          ? "Kadar glukosa darah puasa (mg/dL). Normal berkisar 70–99. Contoh: 85."
+          : "Fasting blood glucose level (mg/dL). Normal range is 70–99. Example: 85.",
+    },
+
+    BloodPressure: {
+      label: { id: "Tekanan Darah", en: "Blood Pressure" },
+      help:
+        lang === "id"
+          ? "Tekanan darah diastolik (angka bawah) dalam mmHg. Normal sekitar 60–80. Contoh: 75."
+          : "Diastolic blood pressure (lower value) in mmHg. Normal is around 60–80. Example: 75.",
+    },
+
+    SkinThickness: {
+      label: { id: "Ketebalan Kulit", en: "Skin Thickness" },
+      help:
+        lang === "id"
+          ? "Ketebalan lipatan kulit (lemak tubuh) dalam mm. Umumnya 10–30. Contoh: 20."
+          : "Skin fold thickness (body fat) in mm. Commonly 10–30. Example: 20.",
+    },
+
+    Insulin: {
+      label: { id: "Insulin", en: "Insulin" },
+      help:
+        lang === "id"
+          ? "Kadar insulin darah puasa (µU/mL). Nilai normal berkisar 2–25. Contoh: 15."
+          : "Fasting insulin level (µU/mL). Normal range is 2–25. Example: 15.",
+    },
+
+    BMI: {
+      label: { id: "BMI", en: "BMI" },
+      help:
+        lang === "id"
+          ? "Indeks massa tubuh. Normal 18,5–24,9. Contoh: 22,5."
+          : "Body Mass Index. Normal range is 18.5–24.9. Example: 22.5.",
+    },
+
+    DiabetesPedigreeFunction: {
+      label: { id: "DPF", en: "Diabetes Pedigree Function" },
+      help:
+        lang === "id"
+          ? "Skor risiko diabetes berdasarkan riwayat keluarga. Umumnya 0,1–0,5. Contoh: 0,35."
+          : "Diabetes risk score based on family history. Commonly 0.1–0.5. Example: 0.35.",
+    },
+
+    Age: {
+      label: { id: "Usia", en: "Age" },
+      help:
+        lang === "id"
+          ? "Usia dalam tahun. Contoh: 30."
+          : "Age in years. Example: 30.",
+    },
+  }),
+  [lang]
+);
+
 
   const loadRiwayat = async () => {
     try {
       const res = await api.get("/prediksi/riwayat");
-      if (res.data && Array.isArray(res.data.data)) {
-        setRiwayat(res.data.data);
-      } else {
-        setRiwayat([]);
-      }
+      // Sort agar yang terbaru ada di atas (descending)
+      const dataSorted = Array.isArray(res.data.data) 
+        ? res.data.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        : [];
+      setRiwayat(dataSorted);
     } catch (err) {
       console.error("Gagal load riwayat:", err);
       setRiwayat([]);
@@ -256,7 +287,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     loadRiwayat();
-
     const loadUser = async () => {
       try {
         const res = await api.get("/user");
@@ -265,7 +295,6 @@ export default function Dashboard() {
         console.error("Gagal load user:", err);
       }
     };
-
     loadUser();
   }, []);
 
@@ -275,14 +304,12 @@ export default function Dashboard() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setError("");
-  setHasilTerakhir(null);
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setHasilTerakhir(null);
 
-  try {
-    // ✅ PREDIKSI KE FLASK (bukan ke Laravel)
-    const res = await flaskApi.post("/predict", {
+    const dataInput = {
       Pregnancies: Number(form.Pregnancies),
       Glucose: Number(form.Glucose),
       BloodPressure: Number(form.BloodPressure),
@@ -291,30 +318,43 @@ export default function Dashboard() {
       BMI: Number(form.BMI),
       DiabetesPedigreeFunction: Number(form.DiabetesPedigreeFunction),
       Age: Number(form.Age),
-    });
+    };
 
-    const raw = res.data?.hasil ?? res.data?.prediction;
-    const rawStr = String(raw).toLowerCase();
+    try {
+      // 1. Prediksi ke Python
+      const res = await flaskApi.post("/predict", dataInput);
+      
+      const rawScore = res.data?.prediction_score; 
+      const rawText = res.data?.prediction; 
+      let kategori = 0;
 
-    let kategori = 0;
-    if (raw === 1 || rawStr.includes("positif")) kategori = 1;
+      if (rawScore === 1) kategori = 1;
+      else if (rawScore === 0) kategori = 0;
+      else {
+        const rawStr = String(rawText || "").toLowerCase();
+        if (rawStr.includes("positif") || rawStr.includes("1")) kategori = 1;
+      }
 
-    setHasilTerakhir(kategori);
+      // 2. Simpan ke Laravel
+      const dataUntukDisimpan = {
+        ...dataInput, 
+        hasil: kategori === 1 ? "Positif Diabetes" : "Negatif Diabetes" 
+      };
 
-    // ✅ riwayat tetap ambil dari Laravel
-    loadRiwayat();
-  } catch (err) {
-    console.error("ERROR:", err.response?.data);
-    setError(
-      lang === "id"
-        ? "Terjadi kesalahan saat prediksi."
-        : "An error occurred during prediction."
-    );
-  } finally {
-    setLoading(false);
-  }
-};
+      await api.post("/prediksi", dataUntukDisimpan);
 
+      // 3. Update UI
+      setHasilTerakhir(kategori);
+      loadRiwayat(); 
+
+    } catch (err) {
+      console.error("ERROR:", err);
+      const errorMsg = err.response?.data?.message || "Terjadi kesalahan koneksi";
+      setError(lang === "id" ? `Gagal: ${errorMsg}` : `Failed: ${errorMsg}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -322,26 +362,11 @@ export default function Dashboard() {
     window.location.href = "/login";
   };
 
-  const pesanHasil =
-    hasilTerakhir === null
-      ? ""
-      : hasilTerakhir === 1
-      ? pesanPositif[lang]
-      : pesanNegatif[lang];
-
-  const labelHasil =
-    hasilTerakhir === null
-      ? ""
-      : hasilTerakhir === 1
-      ? lang === "id"
-        ? "Positif Diabetes"
-        : "Positive Diabetes"
-      : lang === "id"
-      ? "Negatif Diabetes"
-      : "Negative Diabetes";
+  const pesanHasil = hasilTerakhir === null ? "" : hasilTerakhir === 1 ? pesanPositif[lang] : pesanNegatif[lang];
+  const labelHasil = hasilTerakhir === null ? "" : hasilTerakhir === 1 ? (lang === "id" ? "Positif Diabetes" : "Positive Diabetes") : (lang === "id" ? "Negatif Diabetes" : "Negative Diabetes");
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f0f2f5" }}>
+    <div style={{ minHeight: "100vh", background: "#f8f9fa" }}>
       {/* HEADER */}
       <header
         style={{
@@ -351,17 +376,18 @@ export default function Dashboard() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
         }}
       >
         <div>
-          <h2 style={{ margin: 0 }}>{labelText[lang].title}</h2>
-          <small>{labelText[lang].subtitle}</small>
+          <h2 style={{ margin: 0, fontSize: 22 }}>{labelText[lang].title}</h2>
+          <small style={{ opacity: 0.9 }}>{labelText[lang].subtitle}</small>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
           {user && (
             <span style={{ fontSize: 14 }}>
-              {lang === "id" ? "Selamat datang, " : "Welcome, "}
+              {lang === "id" ? "Halo, " : "Hello, "}
               <strong>{user.name}</strong>
             </span>
           )}
@@ -370,13 +396,14 @@ export default function Dashboard() {
             type="button"
             onClick={() => setLang((prev) => (prev === "id" ? "en" : "id"))}
             style={{
-              background: "white",
-              color: "#3b5d50",
+              background: "rgba(255,255,255,0.2)",
+              color: "white",
               borderRadius: 20,
               padding: "6px 14px",
-              border: "none",
+              border: "1px solid rgba(255,255,255,0.4)",
               cursor: "pointer",
               fontWeight: "bold",
+              fontSize: 12
             }}
           >
             {lang === "id" ? "EN" : "ID"}
@@ -385,12 +412,14 @@ export default function Dashboard() {
           <button
             onClick={handleLogout}
             style={{
-              background: "transparent",
+              background: "#d32f2f",
               color: "white",
-              border: "1px solid white",
-              borderRadius: 20,
-              padding: "6px 14px",
+              border: "none",
+              borderRadius: 6,
+              padding: "8px 16px",
               cursor: "pointer",
+              fontSize: 13,
+              fontWeight: "500"
             }}
           >
             {labelText[lang].logout}
@@ -405,7 +434,7 @@ export default function Dashboard() {
             display: "grid",
             gridTemplateColumns: isMobile ? "1fr" : "1.5fr 2fr",
             gap: 24,
-            minWidth: 0, // ✅ KUNCI: biar child grid bisa mengecil
+            minWidth: 0,
           }}
         >
           {/* FORM */}
@@ -413,22 +442,22 @@ export default function Dashboard() {
             style={{
               background: "white",
               padding: 24,
-              borderRadius: 12,
-              boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-              minWidth: 0, // ✅ aman
+              borderRadius: 16,
+              boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+              minWidth: 0,
             }}
           >
-            <h3>{labelText[lang].formTitle}</h3>
+            <h3 style={{ marginTop: 0, color: "#2c3e50" }}>{labelText[lang].formTitle}</h3>
 
             {error && (
               <div
                 style={{
                   background: "#fff3cd",
-                  border: "1px solid #ffeeba",
-                  padding: 10,
-                  borderRadius: 8,
-                  color: "#7a5b00",
-                  marginBottom: 12,
+                  borderLeft: "4px solid #ffc107",
+                  padding: "12px",
+                  borderRadius: 4,
+                  color: "#856404",
+                  marginBottom: 16,
                   fontSize: 13,
                 }}
               >
@@ -439,19 +468,22 @@ export default function Dashboard() {
             {hasilTerakhir !== null && (
               <div
                 style={{
-                  background: hasilTerakhir ? "#ffe5e5" : "#e5f7e5",
-                  color: hasilTerakhir ? "#b00020" : "#136f2d",
-                  padding: 12,
-                  borderRadius: 6,
-                  marginBottom: 12,
+                  background: hasilTerakhir ? "#ffebee" : "#e8f5e9",
+                  color: hasilTerakhir ? "#c62828" : "#2e7d32",
+                  padding: 16,
+                  borderRadius: 8,
+                  marginBottom: 20,
+                  border: hasilTerakhir ? "1px solid #ffcdd2" : "1px solid #c8e6c9",
                 }}
               >
-                <b>
-                  {labelText[lang].hasilLabel}
-                  {labelHasil}
-                </b>
-
-                <div style={{ marginTop: 6 }}>{pesanHasil}</div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                    <span style={{ fontSize: 20 }}>{hasilTerakhir ? "⚠️" : "✅"}</span>
+                    <b style={{ fontSize: 16 }}>
+                    {labelText[lang].hasilLabel}
+                    {labelHasil}
+                    </b>
+                </div>
+                <div style={{ fontSize: 14, lineHeight: "1.5" }}>{pesanHasil}</div>
               </div>
             )}
 
@@ -460,7 +492,7 @@ export default function Dashboard() {
                 style={{
                   display: "grid",
                   gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
-                  gap: 12,
+                  gap: 16,
                 }}
               >
                 {Object.keys(form).map((key) => (
@@ -468,6 +500,9 @@ export default function Dashboard() {
                     <label
                       style={{
                         fontSize: 13,
+                        fontWeight: "600",
+                        color: "#555",
+                        marginBottom: 6,
                         display: "flex",
                         alignItems: "center",
                       }}
@@ -482,13 +517,18 @@ export default function Dashboard() {
                       value={form[key]}
                       onChange={handleChange}
                       required
+                      placeholder="0"
                       style={{
                         width: "100%",
-                        padding: 8,
-                        border: "1px solid #ccc",
-                        borderRadius: 6,
-                        fontSize: 13,
+                        padding: "10px",
+                        border: "1px solid #ddd",
+                        borderRadius: 8,
+                        fontSize: 14,
+                        transition: "border 0.2s",
+                        outline: "none"
                       }}
+                      onFocus={(e) => e.target.style.borderColor = "#3b5d50"}
+                      onBlur={(e) => e.target.style.borderColor = "#ddd"}
                     />
                   </div>
                 ))}
@@ -498,20 +538,22 @@ export default function Dashboard() {
                 type="submit"
                 disabled={loading}
                 style={{
-                  marginTop: 20,
+                  marginTop: 24,
                   width: "100%",
-                  padding: 10,
-                  background: "#3b5d50",
+                  padding: "12px",
+                  background: loading ? "#9aaead" : "#3b5d50",
                   color: "white",
-                  borderRadius: 6,
+                  borderRadius: 8,
                   fontWeight: "bold",
                   border: "none",
-                  cursor: "pointer",
+                  cursor: loading ? "not-allowed" : "pointer",
+                  fontSize: 15,
+                  boxShadow: "0 4px 6px rgba(59, 93, 80, 0.2)"
                 }}
               >
                 {loading
                   ? lang === "id"
-                    ? "Memproses..."
+                    ? "Sedang Memproses..."
                     : "Processing..."
                   : labelText[lang].prediksiBtn}
               </button>
@@ -523,76 +565,97 @@ export default function Dashboard() {
             style={{
               background: "white",
               padding: 24,
-              borderRadius: 12,
-              boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-              minWidth: 0, // ✅ KUNCI: biar scroll di dalamnya bisa jalan
+              borderRadius: 16,
+              boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+              minWidth: 0,
+              display: "flex",
+              flexDirection: "column",
+              height: "fit-content"
             }}
           >
-            <h3>{labelText[lang].riwayat}</h3>
+            <h3 style={{ marginTop: 0, color: "#2c3e50" }}>{labelText[lang].riwayat}</h3>
 
             {riwayat.length === 0 ? (
-              <p>{lang === "id" ? "Tidak ada riwayat." : "No history yet."}</p>
+              <div style={{ textAlign: "center", padding: "40px", color: "#888" }}>
+                  <div style={{ fontSize: 30, marginBottom: 10 }}>📂</div>
+                  {lang === "id" ? "Belum ada riwayat prediksi." : "No prediction history yet."}
+              </div>
             ) : (
               <div
                 style={{
                   width: "100%",
                   maxWidth: "100%",
-                  minWidth: 0, // ✅ KUNCI
+                  minWidth: 0,
                   overflowX: "auto",
-                  overflowY: "hidden",
                   WebkitOverflowScrolling: "touch",
-                  display: "block",
-                  touchAction: "pan-x", // ✅ biar swipe kiri/kanan kebaca di HP
-                  paddingBottom: 6,
                 }}
               >
                 <table
                   style={{
-                    width: "max-content",
+                    width: "100%",
                     minWidth: 700,
                     borderCollapse: "collapse",
                   }}
                 >
                   <thead>
-  <tr>
-    <th style={thStyle}>Tanggal</th>
-    <th style={thStyle}>Hasil</th>
-    <th style={thStyle}>Preg</th>
-    <th style={thStyle}>Glucose</th>
-    <th style={thStyle}>BP</th>
-    <th style={thStyle}>Skin</th>
-    <th style={thStyle}>Insulin</th>
-    <th style={thStyle}>BMI</th>
-    <th style={thStyle}>DPF</th>
-    <th style={thStyle}>Age</th>
-  </tr>
-</thead>
+                    <tr style={{ background: "#f8f9fa" }}>
+                      <th style={thStyle}>Tanggal</th>
+                      <th style={thStyle}>Hasil</th>
+                      <th style={thStyle}>Preg</th>
+                      <th style={thStyle}>Gluc</th>
+                      <th style={thStyle}>BP</th>
+                      <th style={thStyle}>Skin</th>
+                      <th style={thStyle}>Ins</th>
+                      <th style={thStyle}>BMI</th>
+                      <th style={thStyle}>DPF</th>
+                      <th style={thStyle}>Age</th>
+                    </tr>
+                  </thead>
 
+                  <tbody>
+                    {riwayat.map((r) => {
+                        // LOGIKA STYLING WARNA
+                        const isPositif = String(r.hasil).toLowerCase().includes("positif");
+                        
+                        // Style Badge
+                        const badgeStyle = {
+                            display: "inline-block",
+                            padding: "4px 10px",
+                            borderRadius: "20px",
+                            fontSize: "12px",
+                            fontWeight: "bold",
+                            border: isPositif ? "1px solid #ffcdd2" : "1px solid #c8e6c9",
+                            background: isPositif ? "#ffebee" : "#e8f5e9",
+                            color: isPositif ? "#c62828" : "#2e7d32"
+                        };
 
-                 <tbody>
-  {Array.isArray(riwayat) && riwayat.length > 0 ? (
-    riwayat.map((r) => (
-      <tr key={r.id}>
-        <td style={tdStyle}>{r.created_at}</td>
-        <td style={tdStyle}>{r.hasil}</td>
-        <td style={tdStyle}>{r.data_kesehatan?.Pregnancies}</td>
-        <td style={tdStyle}>{r.data_kesehatan?.Glucose}</td>
-        <td style={tdStyle}>{r.data_kesehatan?.BloodPressure}</td>
-        <td style={tdStyle}>{r.data_kesehatan?.SkinThickness}</td>
-        <td style={tdStyle}>{r.data_kesehatan?.Insulin}</td>
-        <td style={tdStyle}>{r.data_kesehatan?.BMI}</td>
-        <td style={tdStyle}>{r.data_kesehatan?.DiabetesPedigreeFunction}</td>
-        <td style={tdStyle}>{r.data_kesehatan?.Age}</td>
-      </tr>
-    ))
-  ) : (
-    <tr>
-      <td colSpan={10} style={{ textAlign: "center", padding: 12 }}>
-        {lang === "id" ? "Tidak ada riwayat." : "No history yet."}
-      </td>
-    </tr>
-  )}
-</tbody>
+                        return (
+                            <tr key={r.id} style={{ transition: "background 0.2s" }} onMouseOver={e => e.currentTarget.style.background = "#fafafa"} onMouseOut={e => e.currentTarget.style.background = "white"}>
+                                <td style={tdStyle}>
+                                    {/* Panggil fungsi format tanggal di sini */}
+                                    {formatTanggal(r.created_at)}
+                                </td>
+                                <td style={tdStyle}>
+                                    <span style={badgeStyle}>
+                                        {r.hasil}
+                                    </span>
+                                </td>
+                                <td style={tdStyle}>{r.data_kesehatan?.Pregnancies}</td>
+                                <td style={tdStyle}>
+                                    <strong style={{ color: r.data_kesehatan?.Glucose > 140 ? "#e67e22" : "inherit"}}>
+                                        {r.data_kesehatan?.Glucose}
+                                    </strong>
+                                </td>
+                                <td style={tdStyle}>{r.data_kesehatan?.BloodPressure}</td>
+                                <td style={tdStyle}>{r.data_kesehatan?.SkinThickness}</td>
+                                <td style={tdStyle}>{r.data_kesehatan?.Insulin}</td>
+                                <td style={tdStyle}>{r.data_kesehatan?.BMI}</td>
+                                <td style={tdStyle}>{r.data_kesehatan?.DiabetesPedigreeFunction}</td>
+                                <td style={tdStyle}>{r.data_kesehatan?.Age}</td>
+                            </tr>
+                        );
+                    })}
+                  </tbody>
                 </table>
               </div>
             )}

@@ -579,13 +579,6 @@ export default function Predictions() {
               <div className="btn-group">
                 <button
                   className="btn btn-outline-secondary btn-sm"
-                  onClick={() => setPage(1)}
-                  disabled={page <= 1}
-                >
-                  «
-                </button>
-                <button
-                  className="btn btn-outline-secondary btn-sm"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page <= 1}
                 >
@@ -597,13 +590,6 @@ export default function Predictions() {
                   disabled={page >= totalPages}
                 >
                   Next
-                </button>
-                <button
-                  className="btn btn-outline-secondary btn-sm"
-                  onClick={() => setPage(totalPages)}
-                  disabled={page >= totalPages}
-                >
-                  »
                 </button>
               </div>
             </div>

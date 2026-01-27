@@ -70,38 +70,43 @@ class PrediksiController extends Controller
         }
 
         // 💾 SIMPAN HASIL
-        HasilPrediksi::create([
-            'user_id'           => $user->id,
-            'data_kesehatan_id' => $data->id,
-            'hasil'             => $hasil,
-            'tanggal_prediksi'  => now(),
+        $hasilPrediksi = HasilPrediksi::create([
+            'user_id'            => $user->id,
+            'data_kesehatan_id'  => $data->id,
+            'hasil'              => $hasil,
+            'tanggal_prediksi'   => now(),
         ]);
 
+        // ✅ AMBIL 1 RECORD RIWAYAT TERBARU LENGKAP
+        $riwayatBaru = HasilPrediksi::with('dataKesehatan')->find($hasilPrediksi->id);
+
+        // ✅ RETURN: termasuk riwayat baru
         return response()->json([
             'message' => 'Prediksi berhasil',
             'hasil'   => $hasil,
             'data'    => $data,
+            'riwayat' => $riwayatBaru,
         ], 200);
     }
 
     public function riwayat(Request $request)
-{
-    $user = $request->user();
+    {
+        $user = $request->user();
 
-    if (!$user) {
+        if (!$user) {
+            return response()->json([
+                'message' => 'Unauthenticated'
+            ], 401);
+        }
+
+        $riwayat = HasilPrediksi::with('dataKesehatan')
+            ->where('user_id', $user->id)
+            ->orderByDesc('tanggal_prediksi')
+            ->get();
+
         return response()->json([
-            'message' => 'Unauthenticated'
-        ], 401);
+            'message' => 'Riwayat prediksi berhasil',
+            'data' => $riwayat
+        ], 200);
     }
-
-    $riwayat = HasilPrediksi::with('dataKesehatan')
-        ->where('user_id', $user->id)
-        ->orderByDesc('tanggal_prediksi')
-        ->get();
-
-    return response()->json([
-        'message' => 'Riwayat prediksi berhasil',
-        'data' => $riwayat
-    ], 200);
-}
 }

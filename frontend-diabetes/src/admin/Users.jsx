@@ -326,9 +326,6 @@ export default function Users() {
               </div>
 
               <div className="btn-group">
-                <button className="btn btn-outline-secondary btn-sm" onClick={() => setPage(1)} disabled={page <= 1}>
-                  «
-                </button>
                 <button
                   className="btn btn-outline-secondary btn-sm"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -342,9 +339,6 @@ export default function Users() {
                   disabled={page >= totalPages}
                 >
                   Next
-                </button>
-                <button className="btn btn-outline-secondary btn-sm" onClick={() => setPage(totalPages)} disabled={page >= totalPages}>
-                  »
                 </button>
               </div>
             </div>

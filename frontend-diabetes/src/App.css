@@ -59,17 +59,77 @@ img { max-width: 100%; height: auto; }
   border-radius: 999px;
 }
 
+/* slide hero: tinggi responsif */
 .predia-hero-slide {
   position: relative;
+  width: 100%;
+
+  /* ✅ ini kuncinya: tinggi hero adaptif */
   min-height: 520px;
+  height: clamp(520px, 72vh, 820px);
+
   background-size: cover;
+  background-repeat: no-repeat;
+
+  /* default desktop */
   background-position: center;
+
   transition: filter 350ms ease, opacity 350ms ease;
   overflow: hidden;
 }
 
 /* fade waktu background ganti */
 .predia-hero-slide.hero-fade { opacity: 0.15; }
+
+/* konten hero jangan terlalu tinggi */
+.predia-hero-content {
+  position: relative;
+  z-index: 2;
+
+  /* ✅ responsif: ga bikin kepotong */
+  padding: clamp(30px, 6vh, 70px) 0;
+}
+
+/* judul responsif (punyamu ada yang 60px fixed—ini bikin "kepotong") */
+.predia-hero-title{
+  font-size: clamp(34px, 5vw, 60px);
+  line-height: 1.06;
+}
+
+/* paragraf responsif */
+.predia-hero-text{
+  font-size: clamp(14px, 2.2vw, 18px);
+  line-height: 1.7;
+  max-width: 560px;
+}
+
+/* tombol biar gak nabrak */
+.predia-hero-actions{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+/* ✅ MOBILE FIX: fokus gambar digeser biar objek ga kepotong */
+@media (max-width: 768px) {
+  .predia-hero-slide {
+    height: auto;
+    min-height: 560px;
+    background-position: 70% center; /* geser fokus gambar */
+  }
+
+  .predia-hero-content {
+    padding: 34px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .predia-hero-slide {
+    min-height: 600px;
+    background-position: 78% center;
+  }
+}
 
 /* background layer */
 .predia-hero-slide .predia-hero-bg {
@@ -2567,6 +2627,190 @@ html, body { width: 100%; overflow-x: hidden; }
     height: 100vh !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ===== HERO WRAPPER ===== */
+.predia-hero-carousel {
+  width: 100%;
+}
+
+/* ===== HERO SLIDE (BACKGROUND) ===== */
+.predia-hero-slide {
+  position: relative;
+  width: 100%;
+  min-height: clamp(520px, 80vh, 760px); /* aman: gak kekecilan & gak maksa 100vh */
+  padding: clamp(56px, 8vw, 92px) 0;
+  display: flex;
+  align-items: center;
+
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: var(--hero-pos, center);
+}
+
+/* mobile background position override */
+@media (max-width: 991.98px) {
+  .predia-hero-slide {
+    background-position: var(--hero-pos-mobile, center);
+  }
+}
+
+/* overlay */
+.predia-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.55),
+    rgba(0, 0, 0, 0.15)
+  );
+  pointer-events: none;
+}
+
+/* content always on top */
+.predia-hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* panel */
+.predia-hero-panel {
+  max-width: 640px;
+}
+
+/* typography responsive */
+.predia-hero-title {
+  margin: 0;
+  font-weight: 800;
+  line-height: 1.05;
+  font-size: clamp(28px, 3.6vw, 56px);
+  color: #fff;
+}
+
+.predia-hero-text {
+  margin-top: 14px;
+  margin-bottom: 0;
+  color: rgba(255,255,255,0.85);
+  font-size: clamp(14px, 1.4vw, 18px);
+  line-height: 1.6;
+}
+
+/* buttons wrap */
+.predia-hero-actions {
+  margin-top: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* make actions full width on small screens */
+@media (max-width: 575.98px) {
+  .predia-hero-actions a {
+    width: 100%;
+    text-align: center;
+  }
+
+  .predia-hero-panel {
+    max-width: 100%;
+  }
+
+  /* overlay lebih gelap biar teks tetap kebaca */
+  .predia-hero-overlay {
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.6),
+      rgba(0, 0, 0, 0.25)
+    );
+  }
+}
+
+/* IMPORTANT: pastikan ga ada yang maksa kepotong */
+.predia-hero-carousel,
+.predia-hero-slide,
+.carousel-inner,
+.carousel-item {
+  overflow: visible; /* jangan hidden kalau konten bisa melebar */
+}
+
+@media (max-width: 575.98px) {
+  /* kasih ruang dari navbar + atas */
+  .predia-hero-slide{
+    min-height: 72vh;                 /* jangan kegedean biar gak terasa kosong */
+    padding-top: 88px;                /* INI yang bikin gak ngepres */
+    padding-bottom: 44px;
+  }
+
+  /* panel teksnya dibikin lebih "lega" */
+  .predia-hero-panel{
+    padding: 14px 14px 12px;
+    border-radius: 16px;
+    background: rgba(0,0,0,0.22);     /* glass tipis supaya teks kebaca */
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  /* heading jangan terlalu mepet & rapet */
+  .predia-hero-title{
+    font-size: 30px;                  /* bisa 28-32 */
+    line-height: 1.12;
+    letter-spacing: -0.2px;
+  }
+
+  .predia-hero-text{
+    font-size: 14px;
+    line-height: 1.55;
+    margin-top: 10px;
+  }
+
+  /* tombol jangan tinggi banget + rapihin gap */
+  .predia-hero-actions{
+    margin-top: 14px;
+    gap: 10px;
+  }
+
+  .predia-hero-actions .btn{
+    padding: 12px 14px;
+    border-radius: 999px;
+  }
+}
+@media (max-width: 575.98px) {
+  .predia-hero-panel{
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(0,0,0,0.18) !important; /* ganti blur jadi tint */
+  }
+}
+
+/* 1) Biar dropdown gak ke-clip pas navbar collapse */
+.custom-navbar,
+.custom-navbar .navbar-collapse {
+  overflow: visible !important;
+}
+
+/* 2) Pastikan dropdown muncul di atas elemen lain */
+.predia-lang-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 9999;
+}
+
+/* 3) Jaga-jaga: kalau ada parent yang relative, tetap aman */
+.custom-navbar .nav-item.position-relative {
+  position: relative;
+}
+.custom-navbar .container,
+.custom-navbar .navbar-nav,
+.custom-navbar .custom-navbar-cta {
+  overflow: visible !important;
+}
+
+@media (max-width: 575.98px) {
+  .predia-lang-menu {
+    left: 0;
+    right: auto;
+    min-width: 180px;
   }
 }
 
