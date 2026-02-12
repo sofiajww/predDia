@@ -156,6 +156,10 @@ export default function Dashboard() {
   const [error, setError] = useState("");
   const [riwayat, setRiwayat] = useState([]);
 
+  // === ANTI DOBEL (DEV STRICTMODE / DOUBLE SUBMIT) ===
+  const didInitLoad = useRef(false);
+  const inFlightSubmit = useRef(false);
+
   // TEXT TERJEMAHAN
   const pesanPositif = useMemo(
     () => ({
@@ -198,59 +202,70 @@ export default function Dashboard() {
   );
 
   // META DATA FIELD
-const fieldMeta = useMemo(
-  () => ({
-    Pregnancies: {
-      label: { id: "Jumlah Kehamilan", en: "Pregnancies" },
-      help:
-        lang === "id"
-          ? "Jumlah total kehamilan yang pernah dialami. Contoh: 0 (belum pernah hamil / pria), 1–3 (umum)."
-          : "Total number of pregnancies. Example: 0 (never pregnant / male), 1–3 (common).",
-    },
+  const fieldMeta = useMemo(
+    () => ({
+      Pregnancies: {
+        label: { id: "Jumlah Kehamilan", en: "Pregnancies" },
+        help:
+          lang === "id"
+            ? "Jumlah total kehamilan yang pernah dialami. Contoh: 0 (belum pernah hamil / pria), 1–3 (umum)."
+            : "Total number of pregnancies. Example: 0 (never pregnant / male), 1–3 (common).",
+      },
 
-    Glucose: {
-      label: { id: "Glukosa", en: "Glucose" },
-      help:
-        lang === "id"
-          ? "Kadar glukosa darah puasa (mg/dL). Normal berkisar 70–99. Contoh: 85."
-          : "Fasting blood glucose level (mg/dL). Normal range is 70–99. Example: 85.",
-    },
+      Glucose: {
+        label: { id: "Glukosa", en: "Glucose" },
+        help:
+          lang === "id"
+            ? "Kadar glukosa darah puasa (mg/dL). Normal berkisar 70–99. Contoh: 85."
+            : "Fasting blood glucose level (mg/dL). Normal range is 70–99. Example: 85.",
+      },
 
-    BMI: {
-      label: { id: "BMI", en: "BMI" },
-      help:
-        lang === "id"
-          ? "Indeks massa tubuh. Normal 18,5–24,9. Contoh: 22,5."
-          : "Body Mass Index. Normal range is 18.5–24.9. Example: 22.5.",
-    },
+      BMI: {
+        label: { id: "BMI", en: "BMI" },
+        help:
+          lang === "id"
+            ? "Indeks massa tubuh. Normal 18,5–24,9. Contoh: 22,5."
+            : "Body Mass Index. Normal range is 18.5–24.9. Example: 22.5.",
+      },
 
-    DiabetesPedigreeFunction: {
-      label: { id: "DPF", en: "Diabetes Pedigree Function" },
-      help:
-        lang === "id"
-          ? "Skor risiko diabetes berdasarkan riwayat keluarga. Umumnya 0,1–0,5. Contoh: 0,35."
-          : "Diabetes risk score based on family history. Commonly 0.1–0.5. Example: 0.35.",
-    },
+      DiabetesPedigreeFunction: {
+        label: { id: "DPF", en: "Diabetes Pedigree Function" },
+        help:
+          lang === "id"
+            ? "Skor risiko diabetes berdasarkan riwayat keluarga. Umumnya 0,1–0,5. Contoh: 0,35."
+            : "Diabetes risk score based on family history. Commonly 0.1–0.5. Example: 0.35.",
+      },
 
-    Age: {
-      label: { id: "Usia", en: "Age" },
-      help:
-        lang === "id"
-          ? "Usia dalam tahun. Contoh: 30."
-          : "Age in years. Example: 30.",
-    },
-  }),
-  [lang]
-);
-
+      Age: {
+        label: { id: "Usia", en: "Age" },
+        help:
+          lang === "id" ? "Usia dalam tahun. Contoh: 30." : "Age in years. Example: 30.",
+      },
+    }),
+    [lang]
+  );
 
   const loadRiwayat = async () => {
     try {
       const res = await api.get("/prediksi/riwayat");
-      // Sort agar yang terbaru ada di atas (descending)
-      const dataSorted = Array.isArray(res.data.data) 
-        ? res.data.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-        : [];
+      const raw = Array.isArray(res.data?.data) ? res.data.data : [];
+
+      // Dedup untuk jaga-jaga kalau backend ngirim dobel
+      const map = new Map();
+      for (const item of raw) {
+        const key =
+          item?.id ??
+          `${item?.created_at}|${item?.hasil}|${item?.data_kesehatan?.Pregnancies}|${item?.data_kesehatan?.Glucose}|${item?.data_kesehatan?.BMI}|${item?.data_kesehatan?.DiabetesPedigreeFunction}|${item?.data_kesehatan?.Age}`;
+
+        if (!map.has(key)) map.set(key, item);
+      }
+      const dataDedup = Array.from(map.values());
+
+      // Sort terbaru di atas
+      const dataSorted = dataDedup.sort(
+        (a, b) => new Date(b.created_at) - new Date(a.created_at)
+      );
+
       setRiwayat(dataSorted);
     } catch (err) {
       console.error("Gagal load riwayat:", err);
@@ -259,7 +274,12 @@ const fieldMeta = useMemo(
   };
 
   useEffect(() => {
+    // Anti dobel panggilan di DEV (StrictMode)
+    if (didInitLoad.current) return;
+    didInitLoad.current = true;
+
     loadRiwayat();
+
     const loadUser = async () => {
       try {
         const res = await api.get("/user");
@@ -278,12 +298,16 @@ const fieldMeta = useMemo(
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Anti double-submit (klik cepat / enter berkali-kali)
+    if (inFlightSubmit.current) return;
+    inFlightSubmit.current = true;
+
     setLoading(true);
     setError("");
     setHasilTerakhir(null);
 
     const dataInput = {
-      
       Pregnancies: Number(form.Pregnancies),
       Glucose: Number(form.Glucose),
       BMI: Number(form.BMI),
@@ -294,9 +318,9 @@ const fieldMeta = useMemo(
     try {
       // 1. Prediksi ke Python
       const res = await flaskApi.post("/predict", dataInput);
-      
-      const rawScore = res.data?.prediction_score; 
-      const rawText = res.data?.prediction; 
+
+      const rawScore = res.data?.prediction_score;
+      const rawText = res.data?.prediction;
       let kategori = 0;
 
       if (rawScore === 1) kategori = 1;
@@ -308,22 +332,22 @@ const fieldMeta = useMemo(
 
       // 2. Simpan ke Laravel
       const dataUntukDisimpan = {
-        ...dataInput, 
-        hasil: kategori === 1 ? "Positif Diabetes" : "Negatif Diabetes" 
+        ...dataInput,
+        hasil: kategori === 1 ? "Positif Diabetes" : "Negatif Diabetes",
       };
 
       await api.post("/prediksi", dataUntukDisimpan);
 
       // 3. Update UI
       setHasilTerakhir(kategori);
-      loadRiwayat(); 
-
+      loadRiwayat();
     } catch (err) {
       console.error("ERROR:", err);
       const errorMsg = err.response?.data?.message || "Terjadi kesalahan koneksi";
       setError(lang === "id" ? `Gagal: ${errorMsg}` : `Failed: ${errorMsg}`);
     } finally {
       setLoading(false);
+      inFlightSubmit.current = false;
     }
   };
 
@@ -333,8 +357,23 @@ const fieldMeta = useMemo(
     window.location.href = "/login";
   };
 
-  const pesanHasil = hasilTerakhir === null ? "" : hasilTerakhir === 1 ? pesanPositif[lang] : pesanNegatif[lang];
-  const labelHasil = hasilTerakhir === null ? "" : hasilTerakhir === 1 ? (lang === "id" ? "Positif Diabetes" : "Positive Diabetes") : (lang === "id" ? "Negatif Diabetes" : "Negative Diabetes");
+  const pesanHasil =
+    hasilTerakhir === null
+      ? ""
+      : hasilTerakhir === 1
+      ? pesanPositif[lang]
+      : pesanNegatif[lang];
+
+  const labelHasil =
+    hasilTerakhir === null
+      ? ""
+      : hasilTerakhir === 1
+      ? lang === "id"
+        ? "Positif Diabetes"
+        : "Positive Diabetes"
+      : lang === "id"
+      ? "Negatif Diabetes"
+      : "Negative Diabetes";
 
   return (
     <div style={{ minHeight: "100vh", background: "#f8f9fa" }}>
@@ -347,7 +386,7 @@ const fieldMeta = useMemo(
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
+          boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
         }}
       >
         <div>
@@ -374,7 +413,7 @@ const fieldMeta = useMemo(
               border: "1px solid rgba(255,255,255,0.4)",
               cursor: "pointer",
               fontWeight: "bold",
-              fontSize: 12
+              fontSize: 12,
             }}
           >
             {lang === "id" ? "EN" : "ID"}
@@ -390,7 +429,7 @@ const fieldMeta = useMemo(
               padding: "8px 16px",
               cursor: "pointer",
               fontSize: 13,
-              fontWeight: "500"
+              fontWeight: "500",
             }}
           >
             {labelText[lang].logout}
@@ -418,7 +457,9 @@ const fieldMeta = useMemo(
               minWidth: 0,
             }}
           >
-            <h3 style={{ marginTop: 0, color: "#2c3e50" }}>{labelText[lang].formTitle}</h3>
+            <h3 style={{ marginTop: 0, color: "#2c3e50" }}>
+              {labelText[lang].formTitle}
+            </h3>
 
             {error && (
               <div
@@ -444,15 +485,24 @@ const fieldMeta = useMemo(
                   padding: 16,
                   borderRadius: 8,
                   marginBottom: 20,
-                  border: hasilTerakhir ? "1px solid #ffcdd2" : "1px solid #c8e6c9",
+                  border: hasilTerakhir
+                    ? "1px solid #ffcdd2"
+                    : "1px solid #c8e6c9",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                    <span style={{ fontSize: 20 }}>{hasilTerakhir ? "⚠️" : "✅"}</span>
-                    <b style={{ fontSize: 16 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    marginBottom: 8,
+                  }}
+                >
+                  <span style={{ fontSize: 20 }}>{hasilTerakhir ? "⚠️" : "✅"}</span>
+                  <b style={{ fontSize: 16 }}>
                     {labelText[lang].hasilLabel}
                     {labelHasil}
-                    </b>
+                  </b>
                 </div>
                 <div style={{ fontSize: 14, lineHeight: "1.5" }}>{pesanHasil}</div>
               </div>
@@ -501,10 +551,10 @@ const fieldMeta = useMemo(
                         borderRadius: 8,
                         fontSize: 14,
                         transition: "border 0.2s",
-                        outline: "none"
+                        outline: "none",
                       }}
-                      onFocus={(e) => e.target.style.borderColor = "#3b5d50"}
-                      onBlur={(e) => e.target.style.borderColor = "#ddd"}
+                      onFocus={(e) => (e.target.style.borderColor = "#3b5d50")}
+                      onBlur={(e) => (e.target.style.borderColor = "#ddd")}
                     />
                   </div>
                 ))}
@@ -524,7 +574,7 @@ const fieldMeta = useMemo(
                   border: "none",
                   cursor: loading ? "not-allowed" : "pointer",
                   fontSize: 15,
-                  boxShadow: "0 4px 6px rgba(59, 93, 80, 0.2)"
+                  boxShadow: "0 4px 6px rgba(59, 93, 80, 0.2)",
                 }}
               >
                 {loading
@@ -546,15 +596,19 @@ const fieldMeta = useMemo(
               minWidth: 0,
               display: "flex",
               flexDirection: "column",
-              height: "fit-content"
+              height: "fit-content",
             }}
           >
-            <h3 style={{ marginTop: 0, color: "#2c3e50" }}>{labelText[lang].riwayat}</h3>
+            <h3 style={{ marginTop: 0, color: "#2c3e50" }}>
+              {labelText[lang].riwayat}
+            </h3>
 
             {riwayat.length === 0 ? (
               <div style={{ textAlign: "center", padding: "40px", color: "#888" }}>
-                  <div style={{ fontSize: 30, marginBottom: 10 }}>📂</div>
-                  {lang === "id" ? "Belum ada riwayat prediksi." : "No prediction history yet."}
+                <div style={{ fontSize: 30, marginBottom: 10 }}>📂</div>
+                {lang === "id"
+                  ? "Belum ada riwayat prediksi."
+                  : "No prediction history yet."}
               </div>
             ) : (
               <div
@@ -587,43 +641,50 @@ const fieldMeta = useMemo(
 
                   <tbody>
                     {riwayat.map((r) => {
-                        // LOGIKA STYLING WARNA
-                        const isPositif = String(r.hasil).toLowerCase().includes("positif");
-                        
-                        // Style Badge
-                        const badgeStyle = {
-                            display: "inline-block",
-                            padding: "4px 10px",
-                            borderRadius: "20px",
-                            fontSize: "12px",
-                            fontWeight: "bold",
-                            border: isPositif ? "1px solid #ffcdd2" : "1px solid #c8e6c9",
-                            background: isPositif ? "#ffebee" : "#e8f5e9",
-                            color: isPositif ? "#c62828" : "#2e7d32"
-                        };
+                      const isPositif = String(r.hasil)
+                        .toLowerCase()
+                        .includes("positif");
 
-                        return (
-                            <tr key={r.id} style={{ transition: "background 0.2s" }} onMouseOver={e => e.currentTarget.style.background = "#fafafa"} onMouseOut={e => e.currentTarget.style.background = "white"}>
-                                <td style={tdStyle}>
-                                    {/* Panggil fungsi format tanggal di sini */}
-                                    {formatTanggal(r.created_at)}
-                                </td>
-                                <td style={tdStyle}>
-                                    <span style={badgeStyle}>
-                                        {r.hasil}
-                                    </span>
-                                </td>
-                                <td style={tdStyle}>{r.data_kesehatan?.Pregnancies}</td>
-                                <td style={tdStyle}>
-                                    <strong style={{ color: r.data_kesehatan?.Glucose > 140 ? "#e67e22" : "inherit"}}>
-                                        {r.data_kesehatan?.Glucose}
-                                    </strong>
-                                </td>
-                                <td style={tdStyle}>{r.data_kesehatan?.BMI}</td>
-                                <td style={tdStyle}>{r.data_kesehatan?.DiabetesPedigreeFunction}</td>
-                                <td style={tdStyle}>{r.data_kesehatan?.Age}</td>
-                            </tr>
-                        );
+                      const badgeStyle = {
+                        display: "inline-block",
+                        padding: "4px 10px",
+                        borderRadius: "20px",
+                        fontSize: "12px",
+                        fontWeight: "bold",
+                        border: isPositif ? "1px solid #ffcdd2" : "1px solid #c8e6c9",
+                        background: isPositif ? "#ffebee" : "#e8f5e9",
+                        color: isPositif ? "#c62828" : "#2e7d32",
+                      };
+
+                      return (
+                        <tr
+                          key={r.id ?? `${r.created_at}-${r.hasil}`}
+                          style={{ transition: "background 0.2s" }}
+                          onMouseOver={(e) => (e.currentTarget.style.background = "#fafafa")}
+                          onMouseOut={(e) => (e.currentTarget.style.background = "white")}
+                        >
+                          <td style={tdStyle}>{formatTanggal(r.created_at)}</td>
+                          <td style={tdStyle}>
+                            <span style={badgeStyle}>{r.hasil}</span>
+                          </td>
+                          <td style={tdStyle}>{r.data_kesehatan?.Pregnancies}</td>
+                          <td style={tdStyle}>
+                            <strong
+                              style={{
+                                color:
+                                  r.data_kesehatan?.Glucose > 140 ? "#e67e22" : "inherit",
+                              }}
+                            >
+                              {r.data_kesehatan?.Glucose}
+                            </strong>
+                          </td>
+                          <td style={tdStyle}>{r.data_kesehatan?.BMI}</td>
+                          <td style={tdStyle}>
+                            {r.data_kesehatan?.DiabetesPedigreeFunction}
+                          </td>
+                          <td style={tdStyle}>{r.data_kesehatan?.Age}</td>
+                        </tr>
+                      );
                     })}
                   </tbody>
                 </table>
