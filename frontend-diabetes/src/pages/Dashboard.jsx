@@ -146,9 +146,6 @@ export default function Dashboard() {
   const [form, setForm] = useState({
     Pregnancies: "",
     Glucose: "",
-    BloodPressure: "",
-    SkinThickness: "",
-    Insulin: "",
     BMI: "",
     DiabetesPedigreeFunction: "",
     Age: "",
@@ -219,30 +216,6 @@ const fieldMeta = useMemo(
           : "Fasting blood glucose level (mg/dL). Normal range is 70–99. Example: 85.",
     },
 
-    BloodPressure: {
-      label: { id: "Tekanan Darah", en: "Blood Pressure" },
-      help:
-        lang === "id"
-          ? "Tekanan darah diastolik (angka bawah) dalam mmHg. Normal sekitar 60–80. Contoh: 75."
-          : "Diastolic blood pressure (lower value) in mmHg. Normal is around 60–80. Example: 75.",
-    },
-
-    SkinThickness: {
-      label: { id: "Ketebalan Kulit", en: "Skin Thickness" },
-      help:
-        lang === "id"
-          ? "Ketebalan lipatan kulit (lemak tubuh) dalam mm. Umumnya 10–30. Contoh: 20."
-          : "Skin fold thickness (body fat) in mm. Commonly 10–30. Example: 20.",
-    },
-
-    Insulin: {
-      label: { id: "Insulin", en: "Insulin" },
-      help:
-        lang === "id"
-          ? "Kadar insulin darah puasa (µU/mL). Nilai normal berkisar 2–25. Contoh: 15."
-          : "Fasting insulin level (µU/mL). Normal range is 2–25. Example: 15.",
-    },
-
     BMI: {
       label: { id: "BMI", en: "BMI" },
       help:
@@ -310,11 +283,9 @@ const fieldMeta = useMemo(
     setHasilTerakhir(null);
 
     const dataInput = {
+      
       Pregnancies: Number(form.Pregnancies),
       Glucose: Number(form.Glucose),
-      BloodPressure: Number(form.BloodPressure),
-      SkinThickness: Number(form.SkinThickness),
-      Insulin: Number(form.Insulin),
       BMI: Number(form.BMI),
       DiabetesPedigreeFunction: Number(form.DiabetesPedigreeFunction),
       Age: Number(form.Age),
@@ -518,6 +489,11 @@ const fieldMeta = useMemo(
                       onChange={handleChange}
                       required
                       placeholder="0"
+                      onKeyDown={(e) => {
+                        if (["e", "E", "+", "-"].includes(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                       style={{
                         width: "100%",
                         padding: "10px",
@@ -603,9 +579,6 @@ const fieldMeta = useMemo(
                       <th style={thStyle}>Hasil</th>
                       <th style={thStyle}>Preg</th>
                       <th style={thStyle}>Gluc</th>
-                      <th style={thStyle}>BP</th>
-                      <th style={thStyle}>Skin</th>
-                      <th style={thStyle}>Ins</th>
                       <th style={thStyle}>BMI</th>
                       <th style={thStyle}>DPF</th>
                       <th style={thStyle}>Age</th>
@@ -646,9 +619,6 @@ const fieldMeta = useMemo(
                                         {r.data_kesehatan?.Glucose}
                                     </strong>
                                 </td>
-                                <td style={tdStyle}>{r.data_kesehatan?.BloodPressure}</td>
-                                <td style={tdStyle}>{r.data_kesehatan?.SkinThickness}</td>
-                                <td style={tdStyle}>{r.data_kesehatan?.Insulin}</td>
                                 <td style={tdStyle}>{r.data_kesehatan?.BMI}</td>
                                 <td style={tdStyle}>{r.data_kesehatan?.DiabetesPedigreeFunction}</td>
                                 <td style={tdStyle}>{r.data_kesehatan?.Age}</td>
